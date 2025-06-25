@@ -2,22 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.php",
-      "use": "@vercel/php"
-    },
-    {
-      "src": "public/build/*",
+      "src": "public/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)/Attendance/.*",
-      "dest": "api/index.php"
+      "src": "/api/(.*)",
+      "dest": "https://create.carsu.edu.ph/api/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "public/build/index.html"
+      "dest": "public/$1"
     }
   ]
 }
