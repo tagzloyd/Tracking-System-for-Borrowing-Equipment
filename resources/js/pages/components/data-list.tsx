@@ -3,7 +3,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import React from 'react';
 import axios from 'axios';
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'; // If using Heroicons (recommended for Inertia projects)
+import { MagnifyingGlassIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline'; // If using Heroicons (recommended for Inertia projects)
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import jsPDF from 'jspdf';
@@ -42,6 +42,11 @@ export default function TrackingPage() {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(PAGE_SIZE_OPTIONS[0]);
 
+    // Sorting
+    const [sortBy, setSortBy] = React.useState<string>('start_time');
+    const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('desc');
+    const [statusFilter, setStatusFilter] = React.useState<string>('Returned'); // Default to Returned
+
     React.useEffect(() => {
         const fetchTrackings = async () => {
             setLoading(true);
@@ -59,11 +64,11 @@ export default function TrackingPage() {
         fetchTrackings();
     }, [activeTab]);
 
-    // Filtered data based on search AND status "Returned"
+    // Filtered data based on search AND status filter
     const filteredData = trackings.filter(tracking => {
         const q = search.toLowerCase();
-        // Only include status "Returned"
-        if (tracking.status !== 'Returned') return false;
+        // Filter by status
+        if (statusFilter !== 'All' && tracking.status !== statusFilter) return false;
         return (
             tracking.name.toLowerCase().includes(q) ||
             (tracking.student_id && tracking.student_id.toLowerCase().includes(q)) ||
@@ -76,10 +81,27 @@ export default function TrackingPage() {
         );
     });
 
-    const totalRows = filteredData.length;
+    // Sorting
+    const sortedData = React.useMemo(() => {
+        return [...filteredData].sort((a, b) => {
+            let aValue = a[sortBy as keyof Tracking];
+            let bValue = b[sortBy as keyof Tracking];
+            // For date fields, compare as dates
+            if (sortBy === 'start_time' || sortBy === 'end_time') {
+                aValue = aValue ? new Date(aValue as string).getTime() : 0;
+                bValue = bValue ? new Date(bValue as string).getTime() : 0;
+            }
+            if (aValue === undefined || bValue === undefined) return 0;
+            if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+            if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }, [filteredData, sortBy, sortDirection]);
+
+    const totalRows = sortedData.length;
     const totalPages = Math.ceil(totalRows / rowsPerPage);
 
-    const paginatedData = filteredData.slice(
+    const paginatedData = sortedData.slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
     );
@@ -163,6 +185,19 @@ export default function TrackingPage() {
         saveAs(blob, 'Records Of People Borrowed Items.csv');
     };
 
+    // Sorting handler
+    const handleSort = (field: string) => {
+        if (sortBy === field) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(field);
+            setSortDirection('asc');
+        }
+    };
+
+    // Status filter options
+    const statusOptions = ['All', 'Returned', 'Borrowed', 'Deadline'];
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title='Records' />
@@ -176,8 +211,8 @@ export default function TrackingPage() {
                         Export CSV
                     </button>
                 </div>
-                {/* Search Bar */}
-                <div className="flex items-center mb-4">
+                {/* Search and Filter Bar */}
+                <div className="flex flex-col sm:flex-row items-center mb-4 gap-2">
                     <div className="relative w-full max-w-xs">
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                             <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -193,6 +228,18 @@ export default function TrackingPage() {
                             }}
                         />
                     </div>
+                    <select
+                        className="border rounded px-2 py-2 text-sm ml-0 sm:ml-2"
+                        value={statusFilter}
+                        onChange={e => {
+                            setStatusFilter(e.target.value);
+                            setPage(0);
+                        }}
+                    >
+                        {statusOptions.map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                    </select>
                 </div>
                 <div className="mb-4 border-b border-gray-200">
                     <ul className="flex flex-wrap -mb-px">
@@ -223,18 +270,78 @@ export default function TrackingPage() {
                             <tr>
                                 {activeTab === 'students' && (
                                     <>
-                                        <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Student ID</th>
-                                        <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Department</th>
-                                        <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Course</th>
-                                        <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Year</th>
+                                        <th
+                                            className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap cursor-pointer select-none"
+                                            onClick={() => handleSort('student_id')}
+                                        >
+                                            Student ID
+                                            <ChevronUpDownIcon className="inline h-4 w-4 ml-1 text-gray-400" />
+                                        </th>
+                                        <th
+                                            className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap cursor-pointer select-none"
+                                            onClick={() => handleSort('department')}
+                                        >
+                                            Department
+                                            <ChevronUpDownIcon className="inline h-4 w-4 ml-1 text-gray-400" />
+                                        </th>
+                                        <th
+                                            className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap cursor-pointer select-none"
+                                            onClick={() => handleSort('course')}
+                                        >
+                                            Course
+                                            <ChevronUpDownIcon className="inline h-4 w-4 ml-1 text-gray-400" />
+                                        </th>
+                                        <th
+                                            className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap cursor-pointer select-none"
+                                            onClick={() => handleSort('year')}
+                                        >
+                                            Year
+                                            <ChevronUpDownIcon className="inline h-4 w-4 ml-1 text-gray-400" />
+                                        </th>
                                     </>
                                 )}
-                                <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Name</th>
-                                <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Contact</th>
-                                <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Email</th>
-                                <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Equipment</th>
-                                <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Start Time</th>
-                                <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">End Time</th>
+                                <th
+                                    className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap cursor-pointer select-none"
+                                    onClick={() => handleSort('name')}
+                                >
+                                    Name
+                                    <ChevronUpDownIcon className="inline h-4 w-4 ml-1 text-gray-400" />
+                                </th>
+                                <th
+                                    className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap cursor-pointer select-none"
+                                    onClick={() => handleSort('phone')}
+                                >
+                                    Contact
+                                    <ChevronUpDownIcon className="inline h-4 w-4 ml-1 text-gray-400" />
+                                </th>
+                                <th
+                                    className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap cursor-pointer select-none"
+                                    onClick={() => handleSort('email')}
+                                >
+                                    Email
+                                    <ChevronUpDownIcon className="inline h-4 w-4 ml-1 text-gray-400" />
+                                </th>
+                                <th
+                                    className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap cursor-pointer select-none"
+                                    onClick={() => handleSort('equipment_name')}
+                                >
+                                    Equipment
+                                    <ChevronUpDownIcon className="inline h-4 w-4 ml-1 text-gray-400" />
+                                </th>
+                                <th
+                                    className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap cursor-pointer select-none"
+                                    onClick={() => handleSort('start_time')}
+                                >
+                                    Start Time
+                                    <ChevronUpDownIcon className="inline h-4 w-4 ml-1 text-gray-400" />
+                                </th>
+                                <th
+                                    className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap cursor-pointer select-none"
+                                    onClick={() => handleSort('end_time')}
+                                >
+                                    End Time
+                                    <ChevronUpDownIcon className="inline h-4 w-4 ml-1 text-gray-400" />
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">

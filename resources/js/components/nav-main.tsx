@@ -19,10 +19,6 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                     </SidebarMenuItem>
                 ))}
             </SidebarMenu>
-            <SidebarGroupLabel>Tools</SidebarGroupLabel>
-            <SidebarMenu>
-                
-            </SidebarMenu>
         </SidebarGroup>
     );
 }

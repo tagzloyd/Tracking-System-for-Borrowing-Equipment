@@ -8,12 +8,14 @@ export default function MainSelection() {
             <header className="bg-white shadow-sm">
                 <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                     <div className="flex items-center">
-                        <img
-                            src="https://www.carsu.edu.ph/wp-content/uploads/2024/10/CSU-logo-2-black-text-1-1.svg"
-                            alt="CSU Logo"
-                            className="h-12 w-auto mr-4 drop-shadow-lg" // Increased height for visibility
-                            style={{ maxWidth: 160 }}
-                        />
+                        <a href={route('tracking.main')}>
+                            <img
+                                src="https://www.carsu.edu.ph/wp-content/uploads/2024/10/CSU-logo-2-black-text-1-1.svg"
+                                alt="CSU Logo"
+                                className="h-12 w-auto mr-4 drop-shadow-lg"
+                                style={{ maxWidth: 160 }}
+                            />
+                        </a>
                     </div>
                     <div className="text-sm text-gray-500">
                         Equipment Borrowing System
