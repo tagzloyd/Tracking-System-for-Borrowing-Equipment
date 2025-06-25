@@ -14,7 +14,7 @@ class Outsider extends Model
     protected $table = 'outsider';
     
     protected $fillable = [
-        'name', 'email', 'phone', 'equipment_id', 'start_time', 'end_time', 'status'
+        'name', 'email', 'phone', 'equipment_name', 'start_time', 'end_time', 'status'
     ];
     public function equipment()
 {

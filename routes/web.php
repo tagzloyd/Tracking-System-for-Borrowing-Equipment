@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\TrackingController;
-use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\DataListController;
 
 Route::get('/', function () {
@@ -17,7 +16,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Add this new route for tracking
     Route::get('log', [TrackingController::class, 'index'])->name('log');
-    Route::get('equipment', [EquipmentController::class, 'index'])->name('equipment');
     Route::get('data-list', [DataListController::class, 'index'])->name('data-list');
     
 });

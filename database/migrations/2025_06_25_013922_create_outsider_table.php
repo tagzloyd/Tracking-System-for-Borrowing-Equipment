@@ -11,12 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('equipment', function (Blueprint $table) {
+        Schema::create('outsider', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('description')->nullable();
-            $table->string('serial_number')->unique();
-            $table->string('model')->nullable();
+            $table->string('email')->unique();
+            $table->string('phone')->nullable();
+            $table->foreignId('equipment_id')->nullable();
+            $table->dateTime('start_time');
+            $table->dateTime('end_time')->nullable();
+            $table->string('status')->default('active'); 
             $table->timestamps();
         });
     }
@@ -26,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('equipment');
+        Schema::dropIfExists('outsider');
     }
 };

@@ -1,16 +1,17 @@
-import { router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 
 export default function MainSelection() {
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
             {/* Header */}
+            <Head title="Equipment Borrowing Portal" />
             <header className="bg-white shadow-sm">
                 <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                     <div className="flex items-center">
                         <img
                             src="https://www.carsu.edu.ph/wp-content/uploads/2024/10/CSU-logo-2-black-text-1-1.svg"
                             alt="CSU Logo"
-                            className="h-20 w-auto mr-4 drop-shadow-lg" // Increased height for visibility
+                            className="h-12 w-auto mr-4 drop-shadow-lg" // Increased height for visibility
                             style={{ maxWidth: 160 }}
                         />
                     </div>

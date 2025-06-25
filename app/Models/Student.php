@@ -11,7 +11,7 @@ class Student extends Model
      *
      * @var string
      */
-    protected $table = 'student_user';
+    protected $table = 'student';
 
     protected $fillable = [
         'name',
@@ -21,7 +21,7 @@ class Student extends Model
         'year',
         'email',
         'phone', // should be 'phone', not 'phone_number'
-        'equipment_id',
+        'equipment_name', // should be 'equipment_id' to match the foreign key
         'start_time', // should be 'start_time', not 'start_date'
         'end_time',   // should be 'end_time', not 'end_date'
         'status', // e.g., 'active', 'inactive', 'maintenance'

@@ -6,7 +6,6 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookCheckIcon, BookOpen, LayoutGrid, List, Download, Printer, PenToolIcon, BookCheck, ViewIcon, CogIcon, Book } from 'lucide-react';
 import AppLogo from './app-logo';
-import EquipmentPage from '@/pages/Equipment';
 import { ViewColumnsIcon } from '@heroicons/react/24/outline';
 
 const mainNavItems: NavItem[] = [
@@ -20,16 +19,11 @@ const mainNavItems: NavItem[] = [
         href: '/log',
         icon: BookCheckIcon,
     },
-    {
-        title: 'Equipment',
-        href: '/equipment',
-        icon: CogIcon,
-    }
 ];
 
 const toolsNavItems: NavItem[] = [
     {
-        title: 'Reports',
+        title: 'Records',
         href: '/data-list',
         icon: Book,
     },

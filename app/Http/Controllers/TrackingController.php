@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Equipment;
 use App\Models\Student;
 use App\Models\Outsider;
 use Illuminate\Support\Facades\Log;
@@ -31,11 +30,28 @@ class TrackingController extends Controller
     // Get all tracking records
     public function getAll()
     {
-        $trackings = Student::with('equipment')->get()->map(function($t) {
-            $t->equipment_name = $t->equipment->name ?? null;
-            return $t;
+        // Get both students and outsiders and combine them
+        $students = Student::all()->map(function($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'student_id' => $item->student_id,
+                'department' => $item->department,
+                'course' => $item->course,
+                'year' => $item->year,
+                'email' => $item->email,
+                'phone' => $item->phone,
+                'equipment_name' => $item->equipment_name,
+                'start_time' => $item->start_time,
+                'end_time' => $item->end_time,
+                'status' => $item->status,
+                'type' => 'student'
+            ];
         });
-        return response()->json($trackings);
+
+        
+
+        return $students;
     }
 
     // Store a new tracking record with validation
@@ -49,7 +65,7 @@ class TrackingController extends Controller
             'year' => 'nullable|string|max:255',
             'email' => 'required|email',
             'phone' => 'nullable|string|max:20',
-            'equipment_id' => 'required|exists:equipment,id',
+            'equipment_name' => 'required|string|max:255', // Just a string, no lookup
             'start_time' => 'required|date',
             'end_time' => 'nullable|date|after_or_equal:start_time',
             'status' => 'required|string|max:50',
@@ -66,13 +82,13 @@ class TrackingController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone' => 'nullable|string|max:20',
-            'equipment_id' => 'required|exists:equipment,id',
+            'equipment_name' => 'required|string|max:255', // Just a string, no lookup
             'start_time' => 'required|date',
             'end_time' => 'nullable|date|after_or_equal:start_time',
             'status' => 'required|string|max:50',
         ]);
 
-        $outsider = Outsider::create($validated); // Use Outsider model, not Student
+        $outsider = Outsider::create($validated);
         return response()->json($outsider, 201);
     }
 
@@ -96,7 +112,7 @@ class TrackingController extends Controller
             'year' => 'nullable|string|max:255',
             'email' => 'required|email|unique:student_user,email,' . $id,
             'phone' => 'nullable|string|max:20',
-            'equipment_id' => 'required|exists:equipment,id',
+            'equipment_name' => 'required|string|max:255', // Just a string, no lookup
             'start_time' => 'required|date',
             'end_time' => 'nullable|date|after_or_equal:start_time',
             'status' => 'required|string|max:50',
@@ -117,25 +133,33 @@ class TrackingController extends Controller
     // Fetch all outsider records
     public function getAllOutsiders()
     {
-        $outsiders = Outsider::with('equipment')->get()->map(function($o) {
-            $o->equipment_name = $o->equipment->name ?? null;
-            return $o;
+        $outsiders = Outsider::all()->map(function($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'email' => $item->email,
+                'phone' => $item->phone,
+                'equipment_name' => $item->equipment_name,
+                'start_time' => $item->start_time,
+                'end_time' => $item->end_time,
+                'status' => $item->status,
+                'type' => 'outsider'
+            ];
         });
         return response()->json($outsiders);
     }
+
     public function getDashboardData()
     {
         try {
             $totalStudents = Student::count();
             $totalOutsiders = Outsider::count();
 
-            // Count active "Borrowed" for students
             $activeBorrowedStudents = Student::where(function($q) {
                 $q->whereNull('end_time')
                   ->orWhere('end_time', '>', now());
             })->where('status', '!=', 'Returned')->count();
 
-            // Count active "Borrowed" for outsiders
             $activeBorrowedOutsiders = Outsider::where(function($q) {
                 $q->whereNull('end_time')
                   ->orWhere('end_time', '>', now());
@@ -143,10 +167,10 @@ class TrackingController extends Controller
 
             $activeBorrowings = $activeBorrowedStudents + $activeBorrowedOutsiders;
 
-            $mostUsedEquipment = Equipment::withCount(['students', 'outsiders'])
-                ->orderByDesc('students_count')
-                ->orderByDesc('outsiders_count')
-                ->first();
+            // Remove Equipment-related code
+            $mostUsedEquipment = 'N/A';
+            $equipmentLabels = [];
+            $equipmentUsage = [];
 
             $weeklyLabels = [];
             $weeklyStudents = [];
@@ -168,20 +192,8 @@ class TrackingController extends Controller
                 $monthlyOutsiders[] = Outsider::whereDate('start_time', $date)->count();
             }
 
-            $equipmentDistribution = Equipment::withCount(['students', 'outsiders'])
-                ->orderByDesc('students_count')
-                ->orderByDesc('outsiders_count')
-                ->limit(4)
-                ->get();
-
-            $equipmentLabels = $equipmentDistribution->pluck('name')->toArray();
-            $equipmentUsage = $equipmentDistribution->map(function($equipment) {
-                return ($equipment->students_count ?? 0) + ($equipment->outsiders_count ?? 0);
-            })->toArray();
-
-            $studentActivities = Student::with('equipment')
-                ->latest('start_time')
-                ->limit(5)
+            // Student activities
+            $studentActivities = Student::latest('start_time')
                 ->get()
                 ->map(function($activity) {
                     $status = 'Borrowed';
@@ -198,16 +210,15 @@ class TrackingController extends Controller
                     return [
                         'id' => $activity->id,
                         'name' => $activity->name,
-                        'equipment' => $activity->equipment->name ?? 'Unknown',
                         'time' => $activity->start_time ? \Carbon\Carbon::parse($activity->start_time)->diffForHumans() : '',
                         'status' => $status,
-                        'type' => 'student'
+                        'type' => 'student',
+                        'end_time' => $activity->end_time,
                     ];
                 });
 
-            $outsiderActivities = Outsider::with('equipment')
-                ->latest('start_time')
-                ->limit(5)
+            // Outsider activities
+            $outsiderActivities = Outsider::latest('start_time')
                 ->get()
                 ->map(function($activity) {
                     $status = 'Borrowed';
@@ -216,7 +227,7 @@ class TrackingController extends Controller
                     } elseif ($activity->end_time) {
                         $now = now();
                         if ($now->greaterThan(\Carbon\Carbon::parse($activity->end_time))) {
-                            $status = 'Deadline';
+                            $status = 'Deadline'; 
                         } else {
                             $status = 'Borrowed';
                         }
@@ -224,25 +235,43 @@ class TrackingController extends Controller
                     return [
                         'id' => $activity->id,
                         'name' => $activity->name,
-                        'equipment' => $activity->equipment->name ?? 'Unknown',
                         'time' => $activity->start_time ? \Carbon\Carbon::parse($activity->start_time)->diffForHumans() : '',
                         'status' => $status,
-                        'type' => 'outsider'
+                        'type' => 'outsider',
+                        'end_time' => $activity->end_time,
                     ];
                 });
 
-            $recentActivity = $studentActivities->merge($outsiderActivities)
-                ->sortByDesc('time')
-                ->take(5)
+            // Combine and sort all activities
+            $allActivities = $studentActivities->merge($outsiderActivities)
+                ->sortByDesc('start_time')
                 ->values()
                 ->toArray();
+
+            // Filter for deadlines (status is Deadline)
+            $deadlines = array_filter($allActivities, function($activity) {
+                return $activity['status'] === 'Deadline';
+            });
+
+            // Filter for active borrowings (status is Borrowed or Deadline)
+            $activeBorrowings = array_filter($allActivities, function($activity) {
+                return in_array($activity['status'], ['Borrowed', 'Deadline']);
+            });
+
+            // Filter for returned items
+            $returned = array_filter($allActivities, function($activity) {
+                return $activity['status'] === 'Returned';
+            });
+
+            // Get recent activity (all types, limited to 5)
+            $recentActivity = array_slice($allActivities, 0, 5);
 
             return response()->json([
                 'summary' => [
                     'totalStudents' => $totalStudents,
                     'totalOutsiders' => $totalOutsiders,
-                    'activeBorrowings' => $activeBorrowings,
-                    'mostUsedEquipment' => $mostUsedEquipment?->name ?? 'No equipment'
+                    'activeBorrowings' => count($activeBorrowings),
+                    'mostUsedEquipment' => $mostUsedEquipment
                 ],
                 'weeklyUsage' => [
                     'labels' => $weeklyLabels,
@@ -258,7 +287,10 @@ class TrackingController extends Controller
                     'labels' => $equipmentLabels,
                     'usage' => $equipmentUsage
                 ],
-                'recentActivity' => $recentActivity
+                'recentActivity' => $recentActivity,
+                'activeBorrowings' => array_values($activeBorrowings),
+                'deadlines' => array_values($deadlines),
+                'returned' => array_values($returned)
             ]);
             
         } catch (\Exception $e) {
@@ -269,6 +301,7 @@ class TrackingController extends Controller
             ], 500);
         }
     }
+
     public function updateStatus(Request $request, $id)
     {
         $request->validate([

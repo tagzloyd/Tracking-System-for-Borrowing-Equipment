@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('outsider', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('outsider', function (Blueprint $table) {
+            $table->string('equipment_name', 255)->after('phone');
         });
     }
 
@@ -22,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('outsider');
+        Schema::table('outsider', function (Blueprint $table) {
+            $table->dropColumn('equipment_name');
+        });
     }
 };

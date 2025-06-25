@@ -11,7 +11,7 @@ import 'jspdf-autotable';
 import { title } from 'process';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Reports', href: '/data-list' },
+    { title: 'Records', href: '/data-list' },
 ];
 
 interface Tracking {
@@ -23,7 +23,6 @@ interface Tracking {
     department?: string;
     course?: string;
     year?: string;
-    equipment_id: number;
     equipment_name?: string;
     start_time: string;
     end_time?: string;
@@ -161,12 +160,12 @@ export default function TrackingPage() {
         }));
         const csv = Papa.unparse(exportData);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        saveAs(blob, 'List Of People Borrowed Items.csv');
+        saveAs(blob, 'Records Of People Borrowed Items.csv');
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title='List of People Borrowed Items' />
+            <Head title='Records' />
             <div className="w-full px-2 sm:px-4 py-4">
                 {/* Export Buttons */}
                 <div className="flex gap-2 mb-4">
