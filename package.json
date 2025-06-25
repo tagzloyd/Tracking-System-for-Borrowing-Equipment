@@ -10,7 +10,7 @@
         "lint": "eslint . --fix",
         "types": "tsc --noEmit",
         "predeploy": "npm run build",
-        "deploy": "gh-pages -d public"
+        "deploy": "gh-pages -d dist"
     },
     "devDependencies": {
         "@eslint/js": "^9.19.0",
