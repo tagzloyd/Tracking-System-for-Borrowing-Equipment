@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\StudentConsultation;
+use App\Models\OutsiderConsultation;
 
 class ConsultationController extends Controller
 {
@@ -13,7 +15,25 @@ class ConsultationController extends Controller
     }
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'student_id' => 'required|string|max:20',
+            'department' => 'required|string|max:100',
+            'course' => 'required|string|max:100',
+            'year' => 'required|string|max:10',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:15',
+            'purpose' => 'required|string|max:500',
+        ]);
+
+        // Use Eloquent create with validated data
+        $tracking = StudentConsultation::create($validated);
+        return response()->json($tracking, 201);
+    }
+
+    public function storeOutsider(Request $request)
+    {
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:15',
@@ -21,7 +41,19 @@ class ConsultationController extends Controller
             'office' => 'required|string|max:255',
             'purpose' => 'required|string|max:500',
         ]);
-        $tracking = StudentConsultaion::create($request->all());
+
+        // Use Eloquent create with validated data
+        $tracking = OutsiderConsultation::create($validated);
         return response()->json($tracking, 201);
     }
+    public function allConsultations()
+{
+    $students = StudentConsultation::all();
+    $outsiders = OutsiderConsultation::all();
+
+    return response()->json([
+        'students' => $students,
+        'outsiders' => $outsiders,
+    ]);
+}
 }

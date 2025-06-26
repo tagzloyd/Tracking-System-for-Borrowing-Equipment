@@ -4,23 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class StudentConsultaion extends Model
+class OutsiderConsultation extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'studentconsultation';
+    protected $table = 'outsiderconsultation';
 
     protected $fillable = [
         'name',
-        'student_id',
-        'department',
-        'course',
-        'year',
         'email',
         'phone',
+        'address', // Address of the outsider
+        'office', // Office or organization of the outsider
         'purpose', // Purpose of consultation
     ];
 
