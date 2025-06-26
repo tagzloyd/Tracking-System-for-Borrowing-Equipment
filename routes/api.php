@@ -23,9 +23,7 @@ Route::controller(TrackingController::class)->group(function () {
 Route::get('/dashboard-data', [TrackingController::class, 'getDashboardData']);
 
 Route::controller(ConsultationController::class)->group(function () {
-    Route::get('consultation', 'fetch')->name('consultation.fetch');
-    Route::get('consultation/outsider', 'fetchOutsider')->name('consultation.fetchOutsider');
     Route::post('consultation/store', 'store')->name('consultation.store');
     Route::post('consultation/store-outsider', 'storeOutsider')->name('consultation.storeOutsider');
+    Route::get('consultation/all', 'allConsultations')->name('consultation.all');
 });
-Route::get('consultation/all', [ConsultationController::class, 'allConsultations'])->name('consultation.all');

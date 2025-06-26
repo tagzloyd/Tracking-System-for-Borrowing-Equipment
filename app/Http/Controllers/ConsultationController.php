@@ -25,10 +25,8 @@ class ConsultationController extends Controller
             'phone' => 'required|string|max:15',
             'purpose' => 'required|string|max:500',
         ]);
-
-        // Use Eloquent create with validated data
         $tracking = StudentConsultation::create($validated);
-        return response()->json($tracking, 201);
+        return response()->json($tracking, 201); // <-- always return JSON
     }
 
     public function storeOutsider(Request $request)
@@ -41,19 +39,18 @@ class ConsultationController extends Controller
             'office' => 'required|string|max:255',
             'purpose' => 'required|string|max:500',
         ]);
-
-        // Use Eloquent create with validated data
         $tracking = OutsiderConsultation::create($validated);
         return response()->json($tracking, 201);
     }
-    public function allConsultations()
-{
-    $students = StudentConsultation::all();
-    $outsiders = OutsiderConsultation::all();
 
-    return response()->json([
-        'students' => $students,
-        'outsiders' => $outsiders,
-    ]);
-}
+    public function allConsultations()
+    {
+        $students = StudentConsultation::all();
+        $outsiders = OutsiderConsultation::all();
+
+        return response()->json([
+            'students' => $students,
+            'outsiders' => $outsiders,
+        ]);
+    }
 }

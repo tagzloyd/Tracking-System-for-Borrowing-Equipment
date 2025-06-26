@@ -11,7 +11,7 @@ import 'jspdf-autotable';
 import { title } from 'process';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Records', href: '/data-list' },
+    { title: 'Records', href: '/records' },
 ];
 
 interface Tracking {

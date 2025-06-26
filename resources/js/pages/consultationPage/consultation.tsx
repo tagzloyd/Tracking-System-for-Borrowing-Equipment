@@ -1,14 +1,16 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
 import React, { useEffect } from 'react';
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, UserCircleIcon, AcademicCapIcon, BuildingOffice2Icon } from '@heroicons/react/24/outline';
 import { BreadcrumbItem } from '@/types';
 import axios from 'axios';
+
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Consultation', href: '/consultation' },
+    
 ];
 
-const departments = ["All Departments", "Computer Science", "Engineering", "Business"];
+const departments = ["All Departments", "Computer Science", "Engineering", "Business", "Arts", "Science"];
 
 interface ConsultationUser {
   id?: number | string;
@@ -33,21 +35,20 @@ export default function ConsultationPage() {
   const [department, setDepartment] = React.useState('All Departments');
   const [dateFrom, setDateFrom] = React.useState('');
   const [dateTo, setDateTo] = React.useState('');
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState('');
 
-  const [getuser, setGetUser] = React.useState<ConsultationUser[]>([]);
+  const [visitors, setVisitors] = React.useState<ConsultationUser[]>([]);
   
   const fetchConsultations = async () => {
     try {
-      setLoading(true);
-      const res = await axios.get('/consultation/all');
-      setGetUser([
+      const res = await axios.get('/api/consultation/all');
+      setVisitors([
         ...res.data.students.map((s: Partial<ConsultationUser>) => ({ ...s, type: 'student' })),
         ...res.data.outsiders.map((o: Partial<ConsultationUser>) => ({ ...o, type: 'outsider' })),
       ]);
     } catch (err) {
-      setError('Failed to fetch consultation data');
+      setError('Failed to fetch visitor data. Please try again later.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -58,320 +59,310 @@ export default function ConsultationPage() {
     fetchConsultations();
   }, []);
 
-  const addStudentConsultation = async (data: Omit<ConsultationUser, 'type'>) => {
-    try {
-      const res = await axios.post('/consultation/store', data);
-      setGetUser(prev => [
-        { ...res.data, type: 'student' },
-        ...prev,
-      ]);
-      return true;
-    } catch (error) {
-      setError('Failed to add student consultation');
-      console.error(error);
-      return false;
-    }
-  };
-
-  const addOutsiderConsultation = async (data: Omit<ConsultationUser, 'type'>) => {
-    try {
-      const res = await axios.post('/consultation/store-outsider', data);
-      setGetUser(prev => [
-        { ...res.data, type: 'outsider' },
-        ...prev,
-      ]);
-      return true;
-    } catch (error) {
-      setError('Failed to add outsider consultation');
-      console.error(error);
-      return false;
-    }
-  };
-
-  const [showStudentForm, setShowStudentForm] = React.useState(false);
-  const [showOutsiderForm, setShowOutsiderForm] = React.useState(false);
-
-  const [studentForm, setStudentForm] = React.useState({
-    name: '',
-    student_id: '',
-    department: '',
-    course: '',
-    year: '',
-    email: '',
-    phone: '',
-    purpose: '',
-  });
-
-  const [outsiderForm, setOutsiderForm] = React.useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    office: '',
-    purpose: '',
-  });
-
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
-    return date.toLocaleString();
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
-  const filteredUsers = getuser.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(search.toLowerCase()) || 
-                         (user.student_id && user.student_id.toLowerCase().includes(search.toLowerCase())) ||
-                         (user.id_number && user.id_number.toLowerCase().includes(search.toLowerCase()));
+  const filteredVisitors = visitors.filter(visitor => {
+    const matchesSearch = visitor.name.toLowerCase().includes(search.toLowerCase()) || 
+                         (visitor.student_id && visitor.student_id.toLowerCase().includes(search.toLowerCase())) ||
+                         (visitor.id_number && visitor.id_number.toLowerCase().includes(search.toLowerCase()));
     
     const matchesDepartment = department === 'All Departments' || 
-                            (user.department && user.department === department);
+                            (visitor.department && visitor.department === department);
     
-    const matchesDateFrom = !dateFrom || (user.created_at && new Date(user.created_at) >= new Date(dateFrom));
-    const matchesDateTo = !dateTo || (user.created_at && new Date(user.created_at) <= new Date(dateTo));
+    const matchesDateFrom = !dateFrom || (visitor.created_at && new Date(visitor.created_at) >= new Date(dateFrom));
+    const matchesDateTo = !dateTo || (visitor.created_at && new Date(visitor.created_at) <= new Date(dateTo));
     
     return matchesSearch && matchesDepartment && matchesDateFrom && matchesDateTo;
   });
 
+  const [activeTab, setActiveTab] = React.useState<'student' | 'outsider'>('student');
+
   return (
     <AppLayout>
-      <Head title="Consultation Visitor Log" />
-      <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-            <span className="block sm:inline">{error}</span>
-            <button onClick={() => setError('')} className="absolute top-0 right-0 px-4 py-3">
-              &times;
-            </button>
+      <Head title="Visitor Management System" />
+      <div className="px-4 sm:px-6 lg:px-8 py-8 bg-gray-50 min-h-screen">
+        <div className="max-w-7xl mx-auto">
+          {/* Page Header */}
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Visitor Management System</h1>
+            <p className="text-gray-600 mt-2">Track and manage all visitor consultations</p>
           </div>
-        )}
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-          {/* Replace these with dynamic stats */}
-          <div className="bg-white rounded-xl shadow p-6 flex items-center gap-4">
-            <div>
-              <div className="text-2xl font-bold text-gray-800">{getuser.length}</div>
-              <div className="text-gray-500 text-sm">Total Visitors</div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow p-6 flex items-center gap-4">
-            <div>
-              <div className="text-2xl font-bold text-gray-800">
-                {getuser.filter(u => u.type === 'student').length}
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
               </div>
-              <div className="text-gray-500 text-sm">Students</div>
             </div>
-          </div>
-          <div className="bg-white rounded-xl shadow p-6 flex items-center gap-4">
-            <div>
-              <div className="text-2xl font-bold text-gray-800">
-                {getuser.filter(u => u.type === 'outsider').length}
-              </div>
-              <div className="text-gray-500 text-sm">Outsiders</div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow p-6 flex items-center gap-4">
-            <div>
-              <div className="text-2xl font-bold text-gray-800">
-                {new Set(getuser.map(u => u.department)).size - 1} {/* -1 for undefined */}
-              </div>
-              <div className="text-gray-500 text-sm">Departments</div>
-            </div>
-          </div>
-        </div>
+          )}
 
-        {/* Filter & Search */}
-        <div className="bg-white rounded-xl shadow p-6 mb-6">
-          <div className="font-semibold text-gray-700 mb-4">Filter & Search</div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">Search</label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-                </span>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center">
+                <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+                  <UserCircleIcon className="h-6 w-6" />
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-sm font-medium text-gray-500">Total Visitors</h3>
+                  <p className="text-2xl font-semibold text-gray-900">{visitors.length}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center">
+                <div className="p-3 rounded-full bg-indigo-100 text-indigo-600">
+                  <AcademicCapIcon className="h-6 w-6" />
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-sm font-medium text-gray-500">Students</h3>
+                  <p className="text-2xl font-semibold text-gray-900">
+                    {visitors.filter(v => v.type === 'student').length}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center">
+                <div className="p-3 rounded-full bg-green-100 text-green-600">
+                  <BuildingOffice2Icon className="h-6 w-6" />
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-sm font-medium text-gray-500">External Visitors</h3>
+                  <p className="text-2xl font-semibold text-gray-900">
+                    {visitors.filter(v => v.type === 'outsider').length}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center">
+                <div className="p-3 rounded-full bg-purple-100 text-purple-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-sm font-medium text-gray-500">Departments</h3>
+                  <p className="text-2xl font-semibold text-gray-900">
+                    {new Set(visitors.map(v => v.department)).size - 1}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filter Section */}
+          <div className="bg-white rounded-lg shadow p-6 mb-8">
+            <div className="md:flex md:items-center md:justify-between mb-4">
+              <h2 className="text-lg font-medium text-gray-900">Visitor Records</h2>
+              <div className="mt-4 md:mt-0">
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => setActiveTab('student')}
+                    className={`px-4 py-2 text-sm font-medium rounded-md ${activeTab === 'student' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                  >
+                    Students
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('outsider')}
+                    className={`px-4 py-2 text-sm font-medium rounded-md ${activeTab === 'outsider' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                  >
+                    External Visitors
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                <div className="relative rounded-md shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                    placeholder="Search visitors..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                <select
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                >
+                  {departments.map((dept) => (
+                    <option key={dept} value={dept}>{dept}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">From Date</label>
                 <input
-                  type="text"
-                  className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                  placeholder="Search by name, ID..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
+                  type="date"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">To Date</label>
+                <input
+                  type="date"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">Department</label>
-              <select
-                className="block w-full border border-gray-300 rounded-lg py-2 px-3 text-sm"
-                value={department}
-                onChange={e => setDepartment(e.target.value)}
-              >
-                {departments.map(dep => (
-                  <option key={dep} value={dep}>{dep}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">Date From</label>
-              <input
-                type="date"
-                className="block w-full border border-gray-300 rounded-lg py-2 px-3 text-sm"
-                value={dateFrom}
-                onChange={e => setDateFrom(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">Date To</label>
-              <input
-                type="date"
-                className="block w-full border border-gray-300 rounded-lg py-2 px-3 text-sm"
-                value={dateTo}
-                onChange={e => setDateTo(e.target.value)}
-              />
-            </div>
           </div>
-        </div>
 
-        {/* Add Visitor Buttons */}
-        <div className="mb-4 flex gap-2">
-          <button
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            onClick={() => setShowStudentForm(true)}
-          >
-            Add Student
-          </button>
-          <button
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            onClick={() => setShowOutsiderForm(true)}
-          >
-            Add Outsider
-          </button>
-        </div>
-
-        {/* Student Form Modal */}
-        {showStudentForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded shadow w-full max-w-md">
-              <h2 className="text-lg font-bold mb-4">Add Student Consultation</h2>
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  const success = await addStudentConsultation(studentForm);
-                  if (success) {
-                    setShowStudentForm(false);
-                    setStudentForm({
-                      name: '',
-                      student_id: '',
-                      department: '',
-                      course: '',
-                      year: '',
-                      email: '',
-                      phone: '',
-                      purpose: '',
-                    });
-                  }
-                }}
-                className="space-y-2"
-              >
-                <input className="w-full border rounded px-2 py-1" placeholder="Name" value={studentForm.name} onChange={e => setStudentForm(f => ({ ...f, name: e.target.value }))} required />
-                <input className="w-full border rounded px-2 py-1" placeholder="Student ID" value={studentForm.student_id} onChange={e => setStudentForm(f => ({ ...f, student_id: e.target.value }))} required />
-                <input className="w-full border rounded px-2 py-1" placeholder="Department" value={studentForm.department} onChange={e => setStudentForm(f => ({ ...f, department: e.target.value }))} required />
-                <input className="w-full border rounded px-2 py-1" placeholder="Course" value={studentForm.course} onChange={e => setStudentForm(f => ({ ...f, course: e.target.value }))} required />
-                <input className="w-full border rounded px-2 py-1" placeholder="Year" value={studentForm.year} onChange={e => setStudentForm(f => ({ ...f, year: e.target.value }))} required />
-                <input type="email" className="w-full border rounded px-2 py-1" placeholder="Email" value={studentForm.email} onChange={e => setStudentForm(f => ({ ...f, email: e.target.value }))} required />
-                <input type="tel" className="w-full border rounded px-2 py-1" placeholder="Phone" value={studentForm.phone} onChange={e => setStudentForm(f => ({ ...f, phone: e.target.value }))} required />
-                <textarea className="w-full border rounded px-2 py-1" placeholder="Purpose" value={studentForm.purpose} onChange={e => setStudentForm(f => ({ ...f, purpose: e.target.value }))} required />
-                <div className="flex gap-2 mt-2">
-                  <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
-                  <button type="button" className="bg-gray-300 px-4 py-2 rounded" onClick={() => setShowStudentForm(false)}>Cancel</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Outsider Form Modal */}
-        {showOutsiderForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded shadow w-full max-w-md">
-              <h2 className="text-lg font-bold mb-4">Add Outsider Consultation</h2>
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  const success = await addOutsiderConsultation(outsiderForm);
-                  if (success) {
-                    setShowOutsiderForm(false);
-                    setOutsiderForm({
-                      name: '',
-                      email: '',
-                      phone: '',
-                      address: '',
-                      office: '',
-                      purpose: '',
-                    });
-                  }
-                }}
-                className="space-y-2"
-              >
-                <input className="w-full border rounded px-2 py-1" placeholder="Name" value={outsiderForm.name} onChange={e => setOutsiderForm(f => ({ ...f, name: e.target.value }))} required />
-                <input type="email" className="w-full border rounded px-2 py-1" placeholder="Email" value={outsiderForm.email} onChange={e => setOutsiderForm(f => ({ ...f, email: e.target.value }))} required />
-                <input type="tel" className="w-full border rounded px-2 py-1" placeholder="Phone" value={outsiderForm.phone} onChange={e => setOutsiderForm(f => ({ ...f, phone: e.target.value }))} required />
-                <input className="w-full border rounded px-2 py-1" placeholder="Address" value={outsiderForm.address} onChange={e => setOutsiderForm(f => ({ ...f, address: e.target.value }))} required />
-                <input className="w-full border rounded px-2 py-1" placeholder="Office" value={outsiderForm.office} onChange={e => setOutsiderForm(f => ({ ...f, office: e.target.value }))} required />
-                <textarea className="w-full border rounded px-2 py-1" placeholder="Purpose" value={outsiderForm.purpose} onChange={e => setOutsiderForm(f => ({ ...f, purpose: e.target.value }))} required />
-                <div className="flex gap-2 mt-2">
-                  <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">Save</button>
-                  <button type="button" className="bg-gray-300 px-4 py-2 rounded" onClick={() => setShowOutsiderForm(false)}>Cancel</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Visitor Logs Table */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <div className="font-semibold text-gray-700 mb-4">Recent Visitor Logs</div>
-          {loading ? (
-            <div className="text-center py-8">Loading...</div>
-          ) : (
+          {/* Visitor Table */}
+          <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="px-4 py-2 text-left font-semibold text-gray-500">TIMESTAMP</th>
-                    <th className="px-4 py-2 text-left font-semibold text-gray-500">NAME</th>
-                    <th className="px-4 py-2 text-left font-semibold text-gray-500">ID NUMBER</th>
-                    <th className="px-4 py-2 text-left font-semibold text-gray-500">DEPARTMENT</th>
-                    <th className="px-4 py-2 text-left font-semibold text-gray-500">COURSE</th>
-                    <th className="px-4 py-2 text-left font-semibold text-gray-500">CONTACT</th>
-                    <th className="px-4 py-2 text-left font-semibold text-gray-500">PURPOSE</th>
-                    <th className="px-4 py-2 text-left font-semibold text-gray-500">TYPE</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.length === 0 ? (
+              {loading ? (
+                <div className="flex justify-center items-center p-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+              ) : (
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
                     <tr>
-                      <td colSpan={8} className="py-8 text-center text-gray-400">
-                        No visitor logs found.
-                      </td>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Date & Time
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                      </th>
+                      {activeTab === 'student' ? (
+                        <>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Student ID
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Department
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Course
+                          </th>
+                        </>
+                      ) : (
+                        <>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Email
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Address
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Office
+                          </th>
+                        </>
+                      )}
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Contact
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Purpose
+                      </th>
                     </tr>
-                  ) : (
-                    filteredUsers.map((log, idx) => (
-                      <tr key={log.id || idx} className="border-b last:border-b-0 hover:bg-gray-50">
-                        <td className="px-4 py-2">{formatDate(log.created_at)}</td>
-                        <td className="px-4 py-2">{log.name}</td>
-                        <td className="px-4 py-2">{log.student_id || log.id_number || '-'}</td>
-                        <td className="px-4 py-2">{log.department || '-'}</td>
-                        <td className="px-4 py-2">{log.course || '-'}</td>
-                        <td className="px-4 py-2">{log.phone || log.contact || '-'}</td>
-                        <td className="px-4 py-2">{log.purpose}</td>
-                        <td className="px-4 py-2 capitalize">{log.type}</td>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredVisitors.filter(v => v.type === activeTab).length === 0 ? (
+                      <tr>
+                        <td colSpan={activeTab === 'student' ? 8 : 8} className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                          No visitors found matching your criteria
+                        </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      filteredVisitors
+                        .filter(v => v.type === activeTab)
+                        .map((visitor) => (
+                          <tr key={visitor.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {formatDate(visitor.created_at)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0 h-10 w-10">
+                                  <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                    <UserCircleIcon className="h-6 w-6" />
+                                  </div>
+                                </div>
+                                <div className="ml-4">
+                                  <div className="text-sm font-medium text-gray-900">{visitor.name}</div>
+                                  <div className="text-sm text-gray-500">{visitor.type === 'student' ? 'Student' : 'External Visitor'}</div>
+                                </div>
+                              </div>
+                            </td>
+                            {activeTab === 'student' ? (
+                              <>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  {visitor.student_id || '-'}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  {visitor.department || '-'}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  {visitor.course || '-'}
+                                </td>
+                              </>
+                            ) : (
+                              <>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  {visitor.email || '-'}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  {visitor.address || '-'}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  {visitor.office || '-'}
+                                </td>
+                              </>
+                            )}
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {visitor.phone || visitor.contact || '-'}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <div className="max-w-xs truncate">{visitor.purpose || '-'}</div>
+                            </td>
+                          </tr>
+                        ))
+                    )}
+                  </tbody>
+                </table>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </AppLayout>
