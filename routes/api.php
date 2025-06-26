@@ -20,3 +20,8 @@ Route::controller(TrackingController::class)->group(function () {
     Route::patch('tracking/{id}/status', 'updateStatus')->name('tracking.updateStatus');
 });
 Route::get('/dashboard-data', [TrackingController::class, 'getDashboardData']);
+
+Route::controller(ConsultationController::class)->group(function () {
+    Route::get('consultation', 'index')->name('consultation.index');
+    Route::post('consultation/store', 'store')->name('consultation.store');
+});

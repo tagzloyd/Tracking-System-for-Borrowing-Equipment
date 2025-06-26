@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarGroup, SidebarGroupLabel } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookCheckIcon, BookOpen, LayoutGrid, List, Download, Printer, PenToolIcon, BookCheck, ViewIcon, CogIcon, Book, WarehouseIcon } from 'lucide-react';
+import { BookCheckIcon, BookOpen, LayoutGrid, List, Download, Printer, PenToolIcon, BookCheck, ViewIcon, CogIcon, Book, WarehouseIcon, HeartPulseIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 import { ViewColumnsIcon } from '@heroicons/react/24/outline';
 
@@ -24,17 +24,22 @@ const mainNavItems: NavItem[] = [
         href: '/data-list',
         icon: Book,
     },
+    
 ];
 
 const toolsNavItems: NavItem[] = [
-    //
+    {
+        title: 'Consultation',
+        href: '/consultation',
+        icon: HeartPulseIcon,
+    }
 ];
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Inventory',
-        href: '/inventory',
-        icon: WarehouseIcon,
+        title: 'Consultation',
+        href: '/consultation',
+        icon: HeartPulseIcon,
     },
     {
         title: 'Attendance',
@@ -61,9 +66,24 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <SidebarGroup className="px-2 py-0">
-                    <SidebarGroupLabel>Tracking System</SidebarGroupLabel>
+                    <SidebarGroupLabel>Tracking Management System</SidebarGroupLabel>
                     <SidebarMenu>
                         {mainNavItems.map((item) => (
+                            <SidebarMenuItem key={item.title}>
+                                <SidebarMenuButton asChild tooltip={{ children: item.title }}>
+                                    <Link href={item.href} prefetch>
+                                        {item.icon && <item.icon />}
+                                        <span>{item.title}</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ))}
+                    </SidebarMenu>
+                </SidebarGroup>
+                <SidebarGroup className="px-2 py-0">
+                    <SidebarGroupLabel>Consultation Management System</SidebarGroupLabel>
+                    <SidebarMenu>
+                        {toolsNavItems.map((item) => (
                             <SidebarMenuItem key={item.title}>
                                 <SidebarMenuButton asChild tooltip={{ children: item.title }}>
                                     <Link href={item.href} prefetch>
