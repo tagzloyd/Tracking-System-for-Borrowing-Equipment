@@ -134,7 +134,7 @@ const Home = () => {
                   className="h-12 w-auto mr-4"
                   style={{ maxWidth: 160 }}
                 />
-                <span className="text-xl font-semibold text-gray-800">CREaTE</span>
+                <span className="text-xl font-semibold text-gray-800">CReATe</span>
               </a>
             </div>
             <div className="hidden md:block">
@@ -232,11 +232,11 @@ const Home = () => {
       {/* About Section */}
       <section id="about" className="about-section py-20 bg-white">
         <div className="section-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="section-title text-3xl font-bold text-center text-gray-800 mb-12">About CREaTE</h2>
+          <h2 className="section-title text-3xl font-bold text-center text-gray-800 mb-12">About CReATe</h2>
           <div className="about-content flex flex-col md:flex-row items-center gap-12">
             <div className="about-text md:w-1/2">
               <p className="text-gray-600 mb-6 leading-relaxed">
-                Since 2010, CREaTE has been providing expert consultation services to individuals and organizations. 
+                Since 2010, CReATe has been providing expert consultation services to individuals and organizations. 
                 Our team of certified professionals is dedicated to helping you navigate life's challenges with compassion and expertise.
               </p>
               <p className="text-gray-600 mb-6 leading-relaxed">
@@ -265,7 +265,7 @@ const Home = () => {
               <div className="image-container rounded-lg overflow-hidden shadow-xl">
                 <img 
                   src="https://images.unsplash.com/photo-1573497491765-dccce02b29df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
-                  alt="Team meeting at CREaTE"
+                  alt="Team meeting at CReATe"
                   className="w-full h-auto object-cover"
                 />
               </div>
@@ -631,7 +631,7 @@ const Home = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="footer-col">
-              <h3 className="text-lg font-semibold mb-4">CReATE</h3>
+              <h3 className="text-lg font-semibold mb-4">CReATe</h3>
               <p className="text-gray-400">Providing expert guidance for personal and professional growth since 2010.</p>
             </div>
             <div className="footer-col">
@@ -669,7 +669,7 @@ const Home = () => {
             </div>
           </div>
           <div className="border-t border-gray-700 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">&copy; {new Date().getFullYear()} CREaTE. All rights reserved.</p>
+            <p className="text-gray-400 text-sm">&copy; {new Date().getFullYear()} CReATe. All rights reserved.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <a href="#" className="text-gray-400 hover:text-green-400 transition duration-300">
                 <span className="sr-only">Facebook</span>
