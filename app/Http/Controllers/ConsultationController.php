@@ -13,6 +13,14 @@ class ConsultationController extends Controller
     {
         return Inertia::render('consultationPage/consultation', []);
     }
+    public function studentConsultation()
+    {
+        return Inertia::render('consultationPage/studentConsultation', []);
+    }
+    public function HomePageConsultation()
+    {
+        return Inertia::render('consultationPage/HomePageConsultation', []);
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([

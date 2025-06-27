@@ -1,0 +1,698 @@
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import './Home.css';
+
+const Home = () => {
+  // Form state
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [userType, setUserType] = useState('student'); // 'student' or 'outsider'
+  
+  // Student-specific fields
+  const [studentId, setStudentId] = useState('');
+  const [department, setDepartment] = useState('');
+  const [course, setCourse] = useState('');
+  const [year, setYear] = useState('');
+  
+  // Outsider-specific fields
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [office, setOffice] = useState('');
+  // Carousel state with consistent sizing
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const slides = [
+    {
+      title: "Professional Consultation Services",
+      description: "Expert guidance tailored to your personal and professional growth needs.",
+      button1: "Schedule a Session",
+      button2: "Learn More",
+      image: "https://images.unsplash.com/photo-1573497491765-dccce02b29df?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&h=900&q=80",
+    },
+    {
+      title: "Student Support Programs",
+      description: "Comprehensive support for your academic journey and career development.",
+      button1: "View Programs",
+      button2: "Contact Advisor",
+      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&h=900&q=80",
+    },
+    {
+      title: "Equipment Rental Services",
+      description: "Access to high-quality equipment for your projects and research.",
+      button1: "Browse Equipment",
+      button2: "Check Availability",
+      image: "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&h=900&q=80",
+    }
+  ];
+
+  // Auto-rotate slides
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    
+    const formData = {
+      name,
+      email,
+      purpose: message, // Changed to match backend validation
+      userType,
+      ...(userType === 'student' ? {
+        student_id: studentId,
+        department,
+        course,
+        year,
+        phone
+      } : {
+        address,
+        office,
+        phone
+      })
+    };
+
+    try {
+      const endpoint = userType === 'student' 
+        ? route('consultation.store') 
+        : route('consultation.storeOutsider');
+      
+      const response = await axios.post(endpoint, formData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        }
+      });
+
+      if (response.status === 201) {
+        setIsSubmitted(true);
+        // Reset form
+        setName('');
+        setEmail('');
+        setMessage('');
+        setStudentId('');
+        setDepartment('');
+        setCourse('');
+        setYear('');
+        setPhone('');
+        setAddress('');
+        setOffice('');
+        setTimeout(() => setIsSubmitted(false), 3000);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error('Submission error:', error.response?.data);
+        alert('Failed to submit form. Please try again.');
+      } else {
+        console.error('Error submitting form:', error);
+        alert('An error occurred. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="consultation-container">
+      {/* Navigation */}
+      <nav className="navbar bg-white shadow-md">
+        <div className="navbar-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-20">
+            <div className="flex items-center">
+              <a href={route('consultation.home')} className="flex items-center">
+                <img
+                  src="https://www.carsu.edu.ph/wp-content/uploads/2024/10/CSU-logo-2-black-text-1-1.svg"
+                  alt="CSU Logo"
+                  className="h-12 w-auto mr-4"
+                  style={{ maxWidth: 160 }}
+                />
+                <span className="text-xl font-semibold text-gray-800">CREaTE</span>
+              </a>
+            </div>
+            <div className="hidden md:block">
+              <ul className="nav-links flex space-x-8">
+                {/* <li><a href="#home" className="text-gray-700 hover:text-green-600 transition duration-300">Home</a></li> */}
+                <li><a href="#about" className="text-gray-700 hover:text-green-600 transition duration-300">About</a></li>
+                <li><a href="#services" className="text-gray-700 hover:text-green-600 transition duration-300">Services</a></li>
+                <li><a href="#contact" className="text-gray-700 hover:text-green-600 transition duration-300">Contact</a></li>
+                <li><a href="#" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300">Book Now</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Carousel with Fixed Size */}
+      <section id="home" className="hero-section relative bg-gradient-to-r from-green-50 to-green-100 h-[600px] overflow-hidden">
+        {/* Slides container */}
+        <div className="relative w-full h-full">
+          {slides.map((slide, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 flex items-center ${currentSlide === index ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            >
+              <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div className="flex flex-col md:flex-row items-center gap-12">
+                  {/* Text content - fixed width */}
+                  <div className="md:w-1/2 text-center md:text-left">
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+                      {slide.title}
+                    </h1>
+                    <p className="text-xl text-gray-600 mb-8">
+                      {slide.description}
+                    </p>
+                    <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
+                      <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-md transition duration-300 shadow-lg">
+                        {slide.button1}
+                      </button>
+                      <button className="bg-white hover:bg-gray-100 text-green-700 font-semibold py-3 px-8 rounded-md transition duration-300 border border-green-600">
+                        {slide.button2}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Image container - fixed size */}
+                  <div className="md:w-1/2 h-[400px] flex items-center justify-center">
+                    <img
+                      src={slide.image}
+                      alt={slide.title}
+                      className="w-full h-full object-cover rounded-lg shadow-xl"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Navigation indicators */}
+        <div className="absolute bottom-8 left-0 right-0">
+          <div className="flex justify-center space-x-2">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-3 h-3 rounded-full ${currentSlide === index ? 'bg-green-600' : 'bg-gray-300'}`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Navigation arrows */}
+        <button 
+          onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 p-2 rounded-full shadow-md z-10"
+          aria-label="Previous slide"
+        >
+          <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button 
+          onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 p-2 rounded-full shadow-md z-10"
+          aria-label="Next slide"
+        >
+          <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </section>
+
+
+      {/* About Section */}
+      <section id="about" className="about-section py-20 bg-white">
+        <div className="section-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="section-title text-3xl font-bold text-center text-gray-800 mb-12">About CREaTE</h2>
+          <div className="about-content flex flex-col md:flex-row items-center gap-12">
+            <div className="about-text md:w-1/2">
+              <p className="text-gray-600 mb-6 leading-relaxed">
+                Since 2010, CREaTE has been providing expert consultation services to individuals and organizations. 
+                Our team of certified professionals is dedicated to helping you navigate life's challenges with compassion and expertise.
+              </p>
+              <p className="text-gray-600 mb-6 leading-relaxed">
+                We believe in a holistic approach that addresses the mind, body, and spirit to help our clients achieve balance and fulfillment in their lives.
+              </p>
+              <div className="stats-grid grid grid-cols-2 gap-4 mt-8">
+                <div className="stat-item bg-green-50 p-4 rounded-lg">
+                  <h3 className="text-green-600 font-bold text-2xl">5000+</h3>
+                  <p className="text-gray-600">Clients Served</p>
+                </div>
+                <div className="stat-item bg-green-50 p-4 rounded-lg">
+                  <h3 className="text-green-600 font-bold text-2xl">15+</h3>
+                  <p className="text-gray-600">Years Experience</p>
+                </div>
+                <div className="stat-item bg-green-50 p-4 rounded-lg">
+                  <h3 className="text-green-600 font-bold text-2xl">98%</h3>
+                  <p className="text-gray-600">Client Satisfaction</p>
+                </div>
+                <div className="stat-item bg-green-50 p-4 rounded-lg">
+                  <h3 className="text-green-600 font-bold text-2xl">12</h3>
+                  <p className="text-gray-600">Certified Experts</p>
+                </div>
+              </div>
+            </div>
+            <div className="about-image md:w-1/2">
+              <div className="image-container rounded-lg overflow-hidden shadow-xl">
+                <img 
+                  src="https://images.unsplash.com/photo-1573497491765-dccce02b29df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                  alt="Team meeting at CREaTE"
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section id="services" className="services-section py-20 bg-gray-50">
+        <div className="section-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="section-title text-3xl font-bold text-gray-800 mb-4">Our Services</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">Comprehensive consultation services tailored to your unique needs</p>
+          </div>
+          <div className="services-grid grid md:grid-cols-2 gap-8">
+            <div className="service-card bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 border-t-4 border-green-500">
+              <div className="icon-container bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Borrow Equipment</h3>
+              <p className="text-gray-600 mb-4">One-on-one sessions tailored to your individual needs and goals with our certified counselors.</p>
+              <a href="#" className="text-green-600 font-medium hover:text-green-700 transition duration-300 inline-flex items-center">
+                Learn more <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+              </a>
+            </div>
+            <div className="service-card bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 border-t-4 border-green-500">
+              <div className="icon-container bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Consultation In Center</h3>
+              <p className="text-gray-600 mb-4">Professional advice and assessments to help you navigate your career path and make informed decisions.</p>
+              <a href="#Contact" className="text-green-600 font-medium hover:text-green-700 transition duration-300 inline-flex items-center">
+                Learn more <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="testimonials-section py-20 bg-green-600 text-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-12">What Our Clients Say</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="testimonial-card bg-white bg-opacity-10 p-8 rounded-lg">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-green-500 mr-4 overflow-hidden">
+                  <img src="https://randomuser.me/api/portraits/women/43.jpg" alt="Client" className="w-full h-full object-cover"/>
+                </div>
+                <div>
+                  <h4 className="font-semibold">Sarah Johnson</h4>
+                  <p className="text-green-100 text-sm">Career Counseling Client</p>
+                </div>
+              </div>
+              <p className="italic">"The career guidance I received was transformative. I now have clarity and confidence in my professional path."</p>
+              <div className="flex mt-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                ))}
+              </div>
+            </div>
+            <div className="testimonial-card bg-white bg-opacity-10 p-8 rounded-lg">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-green-500 mr-4 overflow-hidden">
+                  <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Client" className="w-full h-full object-cover"/>
+                </div>
+                <div>
+                  <h4 className="font-semibold">Michael Chen</h4>
+                  <p className="text-green-100 text-sm">Family Therapy Client</p>
+                </div>
+              </div>
+              <p className="italic">"Our family communication has improved dramatically thanks to the sessions at Harmony. Highly recommend!"</p>
+              <div className="flex mt-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                ))}
+              </div>
+            </div>
+            <div className="testimonial-card bg-white bg-opacity-10 p-8 rounded-lg">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-green-500 mr-4 overflow-hidden">
+                  <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Client" className="w-full h-full object-cover"/>
+                </div>
+                <div>
+                  <h4 className="font-semibold">Emily Rodriguez</h4>
+                  <p className="text-green-100 text-sm">Personal Counseling Client</p>
+                </div>
+              </div>
+              <p className="italic">"The compassionate approach of my counselor helped me through a very difficult time. Forever grateful."</p>
+              <div className="flex mt-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="contact-section py-20 bg-white">
+        <div className="section-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="section-title text-3xl font-bold text-center text-gray-800 mb-12">Contact Us</h2>
+          <div className="contact-content grid md:grid-cols-2 gap-12">
+            <div className="contact-info">
+              <h3 className="text-2xl font-semibold text-gray-800 mb-6">Get in Touch</h3>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 bg-green-100 p-2 rounded-full mr-4">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 font-medium">Email</p>
+                    <a href="mailto:info@harmonyconsult.com" className="text-green-600 hover:text-green-700 transition duration-300">create@carsu.edu.ph</a>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 bg-green-100 p-2 rounded-full mr-4">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 font-medium">Phone</p>
+                    <a href="tel:1234567890" className="text-green-600 hover:text-green-700 transition duration-300">(123) 456-7890</a>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 bg-green-100 p-2 rounded-full mr-4">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 font-medium">Address</p>
+                    <p className="text-gray-800">Ampayon, Caraga State University<br/>Butuan City</p>
+                  </div>
+                </div>
+              </div>
+              
+              <h3 className="text-xl font-semibold text-gray-800 mt-10 mb-4">Business Hours</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between border-b border-gray-100 pb-2">
+                  <span className="text-gray-600">Monday - Friday</span>
+                  <span className="text-gray-800 font-medium">9:00 AM - 6:00 PM</span>
+                </div>
+                <div className="flex justify-between border-b border-gray-100 pb-2">
+                  <span className="text-gray-600">Saturday</span>
+                  <span className="text-gray-800 font-medium">Closed</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Sunday</span>
+                  <span className="text-gray-800 font-medium">Closed</span>
+                </div>
+              </div>
+              
+              <div className="mt-8">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Follow Us</h3>
+                <div className="flex space-x-4">
+                  <a href="#" className="social-icon bg-green-100 w-10 h-10 rounded-full flex items-center justify-center text-green-600 hover:bg-green-600 hover:text-white transition duration-300">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"></path></svg>
+                  </a>
+                  <a href="#" className="social-icon bg-green-100 w-10 h-10 rounded-full flex items-center justify-center text-green-600 hover:bg-green-600 hover:text-white transition duration-300">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748 1.15.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"></path></svg>
+                  </a>
+                  <a href="#" className="social-icon bg-green-100 w-10 h-10 rounded-full flex items-center justify-center text-green-600 hover:bg-green-600 hover:text-white transition duration-300">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
+                  </a>
+                  <a href="#" className="social-icon bg-green-100 w-10 h-10 rounded-full flex items-center justify-center text-green-600 hover:bg-green-600 hover:text-white transition duration-300">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <div className="contact-form">
+              {isSubmitted ? (
+                <div className="success-message bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6">
+                  <div className="flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
+                    <span>Thank you for your message! We'll get back to you within 24 hours.</span>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* User Type Selection */}
+                  <div className="form-group">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">I am a:</label>
+                    <div className="flex space-x-4">
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          className="form-radio h-5 w-5 text-green-600"
+                          name="userType"
+                          value="student"
+                          checked={userType === 'student'}
+                          onChange={() => setUserType('student')}
+                        />
+                        <span className="ml-2 text-gray-700">Student</span>
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          className="form-radio h-5 w-5 text-green-600"
+                          name="userType"
+                          value="outsider"
+                          checked={userType === 'outsider'}
+                          onChange={() => setUserType('outsider')}
+                        />
+                        <span className="ml-2 text-gray-700">Outsider</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Common Fields */}
+                  <div className="form-group">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input
+                      type="email"
+                      id="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
+                      required
+                    />
+                  </div>
+
+                  {/* Student Specific Fields */}
+                  {userType === 'student' && (
+                    <>
+                      <div className="form-group">
+                        <label htmlFor="studentId" className="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
+                        <input
+                          type="text"
+                          id="studentId"
+                          value={studentId}
+                          onChange={(e) => setStudentId(e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                        <input
+                          type="text"
+                          id="department"
+                          value={department}
+                          onChange={(e) => setDepartment(e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="course" className="block text-sm font-medium text-gray-700 mb-1">Course</label>
+                        <input
+                          type="text"
+                          id="course"
+                          value={course}
+                          onChange={(e) => setCourse(e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">Year Level</label>
+                        <input
+                          type="text"
+                          id="year"
+                          value={year}
+                          onChange={(e) => setYear(e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
+                          required
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {/* Outsider Specific Fields */}
+                  {userType === 'outsider' && (
+                    <>
+                      <div className="form-group">
+                        <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                        <input
+                          type="text"
+                          id="address"
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="office" className="block text-sm font-medium text-gray-700 mb-1">Office/Organization</label>
+                        <input
+                          type="text"
+                          id="office"
+                          value={office}
+                          onChange={(e) => setOffice(e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
+                          required
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  <div className="form-group">
+                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Purpose of Consultation</label>
+                    <textarea
+                      id="message"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      rows={5}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
+                      required
+                    ></textarea>
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-md transition duration-300 shadow-md"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Sending...' : 'Send Message'}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="footer bg-gray-800 text-white py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="footer-col">
+              <h3 className="text-lg font-semibold mb-4">CReATE</h3>
+              <p className="text-gray-400">Providing expert guidance for personal and professional growth since 2010.</p>
+            </div>
+            <div className="footer-col">
+              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+              <ul className="space-y-2">
+                {/* <li><a href="#home" className="text-gray-400 hover:text-green-400 transition duration-300">Home</a></li> */}
+                <li><a href="#about" className="text-gray-400 hover:text-green-400 transition duration-300">About Us</a></li>
+                <li><a href="#services" className="text-gray-400 hover:text-green-400 transition duration-300">Services</a></li>
+                <li><a href="#contact" className="text-gray-400 hover:text-green-400 transition duration-300">Contact</a></li>
+              </ul>
+            </div>
+            <div className="footer-col">
+              <h3 className="text-lg font-semibold mb-4">Services</h3>
+              <ul className="space-y-2">
+                <li><a href={route('tracking.main')} className="text-gray-400 hover:text-green-400 transition duration-300">Borrow Equipment</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-green-400 transition duration-300">Consultation in the Center</a></li>
+              </ul>
+            </div>
+            <div className="footer-col">
+              <h3 className="text-lg font-semibold mb-4">Newsletter</h3>
+              <p className="text-gray-400 mb-4">Subscribe to our newsletter for the latest updates and tips.</p>
+              <form className="flex">
+                <input 
+                  type="email" 
+                  placeholder="Your email" 
+                  className="px-4 py-2 w-full rounded-l-md focus:outline-none text-gray-800"
+                />
+                <button 
+                  type="submit" 
+                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-r-md transition duration-300"
+                >
+                  Subscribe
+                </button>
+              </form>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
+            <p className="text-gray-400 text-sm">&copy; {new Date().getFullYear()} CREaTE. All rights reserved.</p>
+            <div className="flex space-x-6 mt-4 md:mt-0">
+              <a href="#" className="text-gray-400 hover:text-green-400 transition duration-300">
+                <span className="sr-only">Facebook</span>
+                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"></path></svg>
+              </a>
+              <a href="#" className="text-gray-400 hover:text-green-400 transition duration-300">
+                <span className="sr-only">Instagram</span>
+                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748 1.15.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"></path></svg>
+              </a>
+              <a href="#" className="text-gray-400 hover:text-green-400 transition duration-300">
+                <span className="sr-only">Twitter</span>
+                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
+              </a>
+              <a href="#" className="text-gray-400 hover:text-green-400 transition duration-300">
+                <span className="sr-only">LinkedIn</span>
+                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default Home;
