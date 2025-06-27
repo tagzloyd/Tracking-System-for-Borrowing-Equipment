@@ -20,30 +20,29 @@ const Home = () => {
   // Outsider-specific fields
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
-  const [office, setOffice] = useState('');
+  const [affiliation_or_office, setAffiliationOrOffice] = useState('');
   // Carousel state with consistent sizing
   const [currentSlide, setCurrentSlide] = useState(0);
   const slides = [
     {
-      title: "Professional Consultation Services",
-      description: "Expert guidance tailored to your personal and professional growth needs.",
-      button1: "Schedule a Session",
-      button2: "Learn More",
-      image: "https://images.unsplash.com/photo-1573497491765-dccce02b29df?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&h=900&q=80",
+      title: "Science and Technology-Based Resource Management",
+      description: "Implementing high quality research for sustainable agriculture and coastal resource management.",
+      image: "/images/logos/picture1.jpg",
     },
     {
-      title: "Student Support Programs",
-      description: "Comprehensive support for your academic journey and career development.",
-      button1: "View Programs",
-      button2: "Contact Advisor",
-      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&h=900&q=80",
+      title: "Academic Support and Internship Programs",
+      description: "Providing laboratory support for student research and accommodating internship opportunities.",
+      image: "/images/logos/picture2.jpg",
     },
     {
-      title: "Equipment Rental Services",
-      description: "Access to high-quality equipment for your projects and research.",
-      button1: "Browse Equipment",
-      button2: "Check Availability",
-      image: "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&h=900&q=80",
+      title: "Innovative Research and Development",
+      description: "Developing breakthrough methods in technology, land/water management, food security, and renewable energy.",
+      image: "/images/logos/picture3.jpg",
+    },
+    {
+      title: "Community Engagement and Capacity Building",
+      description: "Conducting trainings, seminars, and extension services for sustainable development.",
+      image: "/images/logos/picture4.jpg",
     }
   ];
 
@@ -74,7 +73,7 @@ const Home = () => {
         phone
       } : {
         address,
-        office,
+        affiliation_or_office,
         phone
       })
     };
@@ -104,7 +103,7 @@ const Home = () => {
         setYear('');
         setPhone('');
         setAddress('');
-        setOffice('');
+        setAffiliationOrOffice('');
         setTimeout(() => setIsSubmitted(false), 3000);
       }
     } catch (error) {
@@ -125,16 +124,21 @@ const Home = () => {
       {/* Navigation */}
       <nav className="navbar bg-white shadow-md">
         <div className="navbar-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-30">
             <div className="flex items-center">
               <a href={route('consultation.home')} className="flex items-center">
                 <img
                   src="https://www.carsu.edu.ph/wp-content/uploads/2024/10/CSU-logo-2-black-text-1-1.svg"
                   alt="CSU Logo"
-                  className="h-12 w-auto mr-4"
+                  className="h-40 w-auto mr-4"
                   style={{ maxWidth: 160 }}
                 />
-                <span className="text-xl font-semibold text-gray-800">CReATe</span>
+                <img
+                  src="/images/logos/CSU_CREATE_Logo.png"
+                  alt="CSU Logo"
+                  className="h-20 w-auto mr-0"
+                  style={{ maxWidth: 160 }}
+                />
               </a>
             </div>
             <div className="hidden md:block">
@@ -142,8 +146,8 @@ const Home = () => {
                 {/* <li><a href="#home" className="text-gray-700 hover:text-green-600 transition duration-300">Home</a></li> */}
                 <li><a href="#about" className="text-gray-700 hover:text-green-600 transition duration-300">About</a></li>
                 <li><a href="#services" className="text-gray-700 hover:text-green-600 transition duration-300">Services</a></li>
-                <li><a href="#contact" className="text-gray-700 hover:text-green-600 transition duration-300">Contact</a></li>
-                <li><a href="#" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300">Book Now</a></li>
+                {/* <li><a href="#contact" className="text-gray-700 hover:text-green-600 transition duration-300">Contact</a></li> */}
+                <li><a href="#contact" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300">Contact Us</a></li>
               </ul>
             </div>
           </div>
@@ -153,13 +157,13 @@ const Home = () => {
       {/* Hero Carousel with Fixed Size */}
       <section id="home" className="hero-section relative bg-gradient-to-r from-green-50 to-green-100 h-[600px] overflow-hidden">
         {/* Slides container */}
-        <div className="relative w-full h-full">
+        <div className="relative w-full h-full" >
           {slides.map((slide, index) => (
             <div
               key={index}
               className={`absolute inset-0 transition-opacity duration-1000 flex items-center ${currentSlide === index ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             >
-              <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                 <div className="flex flex-col md:flex-row items-center gap-12">
                   {/* Text content - fixed width */}
                   <div className="md:w-1/2 text-center md:text-left">
@@ -169,14 +173,6 @@ const Home = () => {
                     <p className="text-xl text-gray-600 mb-8">
                       {slide.description}
                     </p>
-                    <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
-                      <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-md transition duration-300 shadow-lg">
-                        {slide.button1}
-                      </button>
-                      <button className="bg-white hover:bg-gray-100 text-green-700 font-semibold py-3 px-8 rounded-md transition duration-300 border border-green-600">
-                        {slide.button2}
-                      </button>
-                    </div>
                   </div>
                   
                   {/* Image container - fixed size */}
@@ -228,47 +224,115 @@ const Home = () => {
         </button>
       </section>
 
+      <section id="about" className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">About CReATe Center</h2>
+            <div className="w-20 h-1 bg-green-600 mx-auto mb-6"></div>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Pioneering innovation in resource assessment and agricultural technologies
+            </p>
+          </div>
 
-      {/* About Section */}
-      <section id="about" className="about-section py-20 bg-white">
-        <div className="section-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="section-title text-3xl font-bold text-center text-gray-800 mb-12">About CReATe</h2>
-          <div className="about-content flex flex-col md:flex-row items-center gap-12">
-            <div className="about-text md:w-1/2">
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Since 2010, CReATe has been providing expert consultation services to individuals and organizations. 
-                Our team of certified professionals is dedicated to helping you navigate life's challenges with compassion and expertise.
-              </p>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                We believe in a holistic approach that addresses the mind, body, and spirit to help our clients achieve balance and fulfillment in their lives.
-              </p>
-              <div className="stats-grid grid grid-cols-2 gap-4 mt-8">
-                <div className="stat-item bg-green-50 p-4 rounded-lg">
-                  <h3 className="text-green-600 font-bold text-2xl">5000+</h3>
-                  <p className="text-gray-600">Clients Served</p>
+          {/* Content Grid */}
+          <div className="flex flex-col lg:flex-row gap-12 items-start">
+            {/* Left Column - Image */}
+            <div className="lg:w-1/2 order-2 lg:order-1">
+              <div className="relative rounded-xl overflow-hidden shadow-lg">
+                <img 
+                  src="/images/logos/picture5.jpg" 
+                  alt="Research team at CReATe Center, Caraga State University"
+                  className="w-full h-auto object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                  <p className="text-white text-sm font-medium">
+                    CReATe researchers conducting field assessments in Caraga region
+                  </p>
                 </div>
-                <div className="stat-item bg-green-50 p-4 rounded-lg">
-                  <h3 className="text-green-600 font-bold text-2xl">15+</h3>
-                  <p className="text-gray-600">Years Experience</p>
+              </div>
+              <br />
+              
+              {/* Mission & Vision Cards */}
+              <div className="grid md:grid-cols-2 gap-6 mb-10">
+                <div className="bg-green-50 p-6 rounded-xl">
+                  <div className="flex items-center mb-4">
+                    <div className="bg-green-100 p-2 rounded-full mr-4">
+                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800">Mission</h3>
+                  </div>
+                  <p className="text-gray-700">
+                    To lead in innovative resource assessment and precision agriculture technologies through cutting-edge research that enhances productivity and builds climate-resilient farming communities.
+                  </p>
                 </div>
-                <div className="stat-item bg-green-50 p-4 rounded-lg">
-                  <h3 className="text-green-600 font-bold text-2xl">98%</h3>
-                  <p className="text-gray-600">Client Satisfaction</p>
-                </div>
-                <div className="stat-item bg-green-50 p-4 rounded-lg">
-                  <h3 className="text-green-600 font-bold text-2xl">12</h3>
-                  <p className="text-gray-600">Certified Experts</p>
+
+                <div className="bg-blue-50 p-6 rounded-xl">
+                  <div className="flex items-center mb-4">
+                    <div className="bg-blue-100 p-2 rounded-full mr-4">
+                      <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800">Vision</h3>
+                  </div>
+                  <p className="text-gray-700">
+                    To become Mindanao's premier research hub for smart, sustainable agricultural solutions by 2030, ensuring food security through data-driven innovations.
+                  </p>
                 </div>
               </div>
             </div>
-            <div className="about-image md:w-1/2">
-              <div className="image-container rounded-lg overflow-hidden shadow-xl">
-                <img 
-                  src="https://images.unsplash.com/photo-1573497491765-dccce02b29df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
-                  alt="Team meeting at CReATe"
-                  className="w-full h-auto object-cover"
-                />
+
+            {/* Right Column - Content */}
+            <div className="lg:w-1/2 order-1 lg:order-2">
+              {/* Center Introduction */}
+              <div className="mb-10">
+                <h1 className="text-3xl font-semibold text-gray-800 mb-6">
+                  Center for Resource Assessment, Analytics and Emerging Technologies
+                </h1>
+                
+                <div className="space-y-5 text-gray-700">
+                  <p>
+                    The <span className="font-semibold text-green-700">Caraga Resource Assessment, Analytics and Emerging Technologies Center (CReATe)</span> is a flagship research center under the College of Engineering and Geosciences at Caraga State University.
+                  </p>
+                  
+                  <p>
+                    Our core competencies include:
+                  </p>
+                  
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>Advanced agricultural and biosystems engineering research</li>
+                    <li>High-performance computing and data analytics</li>
+                    <li>Emerging technology development and implementation</li>
+                    <li>Professional training and extension services</li>
+                    <li>Technology transfer and commercialization</li>
+                  </ul>
+                  
+                  <p className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-600 italic">
+                    Originally established as the Center for Renewable Energy and Alternative Technology (CREATe), we evolved into our current form following significant capability enhancements through the PhilLiDAR 2 project and in response to the region's rich natural resource endowment.
+                  </p>
+                </div>
               </div>
+              {/* Achievements */}
+              {/* <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">Our Achievements</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { value: "15+", label: "Years of Operation", icon: "🏛️" },
+                    { value: "48", label: "Research Projects", icon: "🔬" },
+                    { value: "96%", label: "Satisfaction Rate", icon: "👍" },
+                    { value: "12", label: "Expert Researchers", icon: "👨‍🔬" }
+                  ].map((item, index) => (
+                    <div key={index} className="text-center p-4">
+                      <span className="text-4xl block mb-2">{item.icon}</span>
+                      <p className="text-3xl font-bold text-green-600">{item.value}</p>
+                      <p className="text-gray-600 mt-1 text-sm">{item.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -278,8 +342,10 @@ const Home = () => {
       <section id="services" className="services-section py-20 bg-gray-50">
         <div className="section-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="section-title text-3xl font-bold text-gray-800 mb-4">Our Services</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">Comprehensive consultation services tailored to your unique needs</p>
+            <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">Our Services</h2>
+            <div className="w-20 h-1 bg-green-600 mx-auto mb-6"></div>
+          </div>
           </div>
           <div className="services-grid grid md:grid-cols-2 gap-8">
             <div className="service-card bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 border-t-4 border-green-500">
@@ -315,7 +381,7 @@ const Home = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-12">What Our Clients Say</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="testimonial-card bg-white bg-opacity-10 p-8 rounded-lg">
+            <div className="testimonial-card bg-green-900 bg-opacity-10 p-8 rounded-lg">
               <div className="flex items-center mb-4">
                 <div className="w-12 h-12 rounded-full bg-green-500 mr-4 overflow-hidden">
                   <img src="https://randomuser.me/api/portraits/women/43.jpg" alt="Client" className="w-full h-full object-cover"/>
@@ -332,7 +398,7 @@ const Home = () => {
                 ))}
               </div>
             </div>
-            <div className="testimonial-card bg-white bg-opacity-10 p-8 rounded-lg">
+            <div className="testimonial-card  bg-green-900 bg-opacity-10 p-8 rounded-lg">
               <div className="flex items-center mb-4">
                 <div className="w-12 h-12 rounded-full bg-green-500 mr-4 overflow-hidden">
                   <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Client" className="w-full h-full object-cover"/>
@@ -349,7 +415,7 @@ const Home = () => {
                 ))}
               </div>
             </div>
-            <div className="testimonial-card bg-white bg-opacity-10 p-8 rounded-lg">
+            <div className="testimonial-card  bg-green-900 bg-opacity-10 p-8 rounded-lg">
               <div className="flex items-center mb-4">
                 <div className="w-12 h-12 rounded-full bg-green-500 mr-4 overflow-hidden">
                   <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Client" className="w-full h-full object-cover"/>
@@ -373,7 +439,11 @@ const Home = () => {
       {/* Contact Section */}
       <section id="contact" className="contact-section py-20 bg-white">
         <div className="section-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="section-title text-3xl font-bold text-center text-gray-800 mb-12">Contact Us</h2>
+         <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-gray-800 mb-4">Contact Us</h2>
+          <div className="w-20 h-1 bg-green-600 mx-auto mb-6"></div>
+          <p className="text-lg text-gray-600">Schedule a consultation with our agricultural technology experts</p>
+        </div>
           <div className="contact-content grid md:grid-cols-2 gap-12">
             <div className="contact-info">
               <h3 className="text-2xl font-semibold text-gray-800 mb-6">Get in Touch</h3>
@@ -393,7 +463,7 @@ const Home = () => {
                   </div>
                   <div>
                     <p className="text-gray-600 font-medium">Phone</p>
-                    <a href="tel:1234567890" className="text-green-600 hover:text-green-700 transition duration-300">(123) 456-7890</a>
+                    <a href="tel:1234567890" className="text-green-600 hover:text-green-700 transition duration-300">09304529690</a>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -402,7 +472,7 @@ const Home = () => {
                   </div>
                   <div>
                     <p className="text-gray-600 font-medium">Address</p>
-                    <p className="text-gray-800">Ampayon, Caraga State University<br/>Butuan City</p>
+                    <p className="text-gray-800">CReATe Office, 2nd Floor Hinang Building, Caraga State University-Main Campus Ampayon, Butuan City, Agusan del Norte 8600</p>
                   </div>
                 </div>
               </div>
@@ -411,7 +481,7 @@ const Home = () => {
               <div className="space-y-2">
                 <div className="flex justify-between border-b border-gray-100 pb-2">
                   <span className="text-gray-600">Monday - Friday</span>
-                  <span className="text-gray-800 font-medium">9:00 AM - 6:00 PM</span>
+                  <span className="text-gray-800 font-medium">8:00 AM - 6:00 PM</span>
                 </div>
                 <div className="flex justify-between border-b border-gray-100 pb-2">
                   <span className="text-gray-600">Saturday</span>
@@ -423,7 +493,7 @@ const Home = () => {
                 </div>
               </div>
               
-              <div className="mt-8">
+              {/* <div className="mt-8">
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">Follow Us</h3>
                 <div className="flex space-x-4">
                   <a href="#" className="social-icon bg-green-100 w-10 h-10 rounded-full flex items-center justify-center text-green-600 hover:bg-green-600 hover:text-white transition duration-300">
@@ -439,7 +509,7 @@ const Home = () => {
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path></svg>
                   </a>
                 </div>
-              </div>
+              </div> */}
             </div>
             
             <div className="contact-form">
@@ -590,9 +660,9 @@ const Home = () => {
                         <label htmlFor="office" className="block text-sm font-medium text-gray-700 mb-1">Office/Organization</label>
                         <input
                           type="text"
-                          id="office"
-                          value={office}
-                          onChange={(e) => setOffice(e.target.value)}
+                          id="affiliation_or_office"
+                          value={affiliation_or_office}
+                          onChange={(e) => setAffiliationOrOffice(e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
                           required
                         />
@@ -640,7 +710,7 @@ const Home = () => {
                 {/* <li><a href="#home" className="text-gray-400 hover:text-green-400 transition duration-300">Home</a></li> */}
                 <li><a href="#about" className="text-gray-400 hover:text-green-400 transition duration-300">About Us</a></li>
                 <li><a href="#services" className="text-gray-400 hover:text-green-400 transition duration-300">Services</a></li>
-                <li><a href="#contact" className="text-gray-400 hover:text-green-400 transition duration-300">Contact</a></li>
+                {/* <li><a href="#contact" className="text-gray-400 hover:text-green-400 transition duration-300">Contact</a></li> */}
               </ul>
             </div>
             <div className="footer-col">
@@ -653,22 +723,9 @@ const Home = () => {
             <div className="footer-col">
               <h3 className="text-lg font-semibold mb-4">Newsletter</h3>
               <p className="text-gray-400 mb-4">Subscribe to our newsletter for the latest updates and tips.</p>
-              <form className="flex">
-                <input 
-                  type="email" 
-                  placeholder="Your email" 
-                  className="px-4 py-2 w-full rounded-l-md focus:outline-none text-gray-800"
-                />
-                <button 
-                  type="submit" 
-                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-r-md transition duration-300"
-                >
-                  Subscribe
-                </button>
-              </form>
             </div>
           </div>
-          <div className="border-t border-gray-700 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
+          {/* <div className="border-t border-gray-700 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">&copy; {new Date().getFullYear()} CReATe. All rights reserved.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <a href="#" className="text-gray-400 hover:text-green-400 transition duration-300">
@@ -688,7 +745,7 @@ const Home = () => {
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path></svg>
               </a>
             </div>
-          </div>
+          </div> */}
         </div>
       </footer>
     </div>

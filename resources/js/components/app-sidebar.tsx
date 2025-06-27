@@ -37,8 +37,8 @@ const toolsNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Consultation',
-        href: '/consultation',
+        title: 'HomePage',
+        href: '/consultation/home',
         icon: HeartPulseIcon,
     },
     {

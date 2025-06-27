@@ -18,7 +18,7 @@ interface ConsultationUser {
   email?: string;
   address?: string;
   phone?: string;
-  office?: string;
+  affiliation_or_office?: string;
   purpose?: string;
   student_id?: string;
   id_number?: string;
@@ -345,7 +345,7 @@ export default function ConsultationPage() {
                                   {visitor.address || '-'}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                  {visitor.office || '-'}
+                                  {visitor.affiliation_or_office || '-'}
                                 </td>
                               </>
                             )}

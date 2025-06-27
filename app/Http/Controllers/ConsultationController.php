@@ -44,7 +44,7 @@ class ConsultationController extends Controller
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:15',
             'address' => 'required|string|max:255',
-            'office' => 'required|string|max:255',
+            'affiliation_or_office' => 'required|string|max:255',
             'purpose' => 'required|string|max:500',
         ]);
         $tracking = OutsiderConsultation::create($validated);

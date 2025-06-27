@@ -18,12 +18,8 @@ class OutsiderConsultation extends Model
         'email',
         'phone',
         'address', // Address of the outsider
-        'office', // Office or organization of the outsider
+        'affiliation_or_office',
         'purpose', // Purpose of consultation
     ];
 
-    public function getRouteKeyName()
-    {
-        return 'email'; // Use email as the route key
-    }
 }
