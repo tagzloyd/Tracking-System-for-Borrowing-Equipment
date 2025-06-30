@@ -342,35 +342,74 @@ const Home = () => {
       <section id="services" className="services-section py-20 bg-gray-50">
         <div className="section-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">Our Services</h2>
             <div className="w-20 h-1 bg-green-600 mx-auto mb-6"></div>
           </div>
-          </div>
-          <div className="services-grid grid md:grid-cols-2 gap-8">
+          
+          <div className="services-grid grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+            {/* Land and Water Resources Service */}
             <div className="service-card bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 border-t-4 border-green-500">
               <div className="icon-container bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Borrow Equipment</h3>
-              <p className="text-gray-600 mb-4">One-on-one sessions tailored to your individual needs and goals with our certified counselors.</p>
-              <a href="#" className="text-green-600 font-medium hover:text-green-700 transition duration-300 inline-flex items-center">
-                Learn more <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-              </a>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Trainings and Consultancy on Land and Water Resources Engineering and Technology</h3>
+              <p className="text-gray-600 mb-4">
+                Consultations, trainings, and referrals on GIS operations for creating, processing, and analyzing agrometeorological, hydrologic, and resource maps including vulnerability and suitability assessments.
+              </p>
+              {/* <a href="#contact" className="text-green-600 font-medium hover:text-green-700 transition duration-300 inline-flex items-center">
+                Learn more <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+              </a> */}
             </div>
+
+            {/* Agricultural Bio-Processing Service */}
             <div className="service-card bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 border-t-4 border-green-500">
               <div className="icon-container bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Consultation In Center</h3>
-              <p className="text-gray-600 mb-4">Professional advice and assessments to help you navigate your career path and make informed decisions.</p>
-              <a href="#Contact" className="text-green-600 font-medium hover:text-green-700 transition duration-300 inline-flex items-center">
-                Learn more <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-              </a>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Trainings and Consultancy on Agricultural Bio-Processing</h3>
+              <p className="text-gray-600 mb-4">
+                Trainings and consultations on handling, storage, and processing of agricultural materials, including equipment design to reduce postharvest losses and add economic value using advanced analytical tools.
+              </p>
+              {/* <a href="#contact" className="text-green-600 font-medium hover:text-green-700 transition duration-300 inline-flex items-center">
+                Learn more <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+              </a> */}
+            </div>
+
+            {/* Agricultural Machinery Service */}
+            <div className="service-card bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 border-t-4 border-green-500">
+              <div className="icon-container bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Trainings and Consultancy on Agricultural Machinery & Structures Designs</h3>
+              <p className="text-gray-600 mb-4">
+                Our professional Agricultural and Biosystems Engineers provide trainings, consultations, designs, and analyses for agricultural machinery and structures using state-of-the-art facilities.
+              </p>
+              {/* <a href="#contact" className="text-green-600 font-medium hover:text-green-700 transition duration-300 inline-flex items-center">
+                Learn more <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+              </a> */}
+            </div>
+
+            {/* Rice Machinery Operations Service */}
+            <div className="service-card bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 border-t-4 border-green-500">
+              <div className="icon-container bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Trainings and Assessment for Rice Machinery Operations NCII</h3>
+              <p className="text-gray-600 mb-4">
+                TESDA-supported trainings and assessments for Rice Machinery Operations National Certificate II, available to students, professionals, and farmers.
+              </p>
+              {/* <a href="#contact" className="text-green-600 font-medium hover:text-green-700 transition duration-300 inline-flex items-center">
+                Learn more <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+              </a> */}
             </div>
           </div>
         </div>
