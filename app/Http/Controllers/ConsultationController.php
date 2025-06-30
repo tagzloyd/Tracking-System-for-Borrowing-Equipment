@@ -13,14 +13,22 @@ class ConsultationController extends Controller
     {
         return Inertia::render('consultationPage/consultation', []);
     }
+    
+    public function reports()
+    {
+        return Inertia::render('consultationPage/reports', []);
+    }
+    
     public function studentConsultation()
     {
         return Inertia::render('consultationPage/studentConsultation', []);
     }
+    
     public function HomePageConsultation()
     {
         return Inertia::render('consultationPage/HomePageConsultation', []);
     }
+    
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -32,9 +40,14 @@ class ConsultationController extends Controller
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:15',
             'purpose' => 'required|string|max:500',
+            'appointment_date' => 'required|date_format:Y-m-d\TH:i', // Matches datetime-local input format
         ]);
+
+        // Convert the datetime format to match database
+        $validated['appointment_date'] = date('Y-m-d H:i:s', strtotime($validated['appointment_date']));
+
         $tracking = StudentConsultation::create($validated);
-        return response()->json($tracking, 201); // <-- always return JSON
+        return response()->json($tracking, 201);
     }
 
     public function storeOutsider(Request $request)
@@ -46,7 +59,12 @@ class ConsultationController extends Controller
             'address' => 'required|string|max:255',
             'affiliation_or_office' => 'required|string|max:255',
             'purpose' => 'required|string|max:500',
+            'appointment_date' => 'required|date_format:Y-m-d\TH:i', // Matches datetime-local input format
         ]);
+
+        // Convert the datetime format to match database
+        $validated['appointment_date'] = date('Y-m-d H:i:s', strtotime($validated['appointment_date']));
+
         $tracking = OutsiderConsultation::create($validated);
         return response()->json($tracking, 201);
     }

@@ -22,5 +22,6 @@ class StudentConsultation extends Model
         'email',
         'phone',
         'purpose',
+        'appointment_date'
     ];
 }

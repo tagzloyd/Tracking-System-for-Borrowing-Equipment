@@ -18,7 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Add this new route for tracking
     Route::get('log', [TrackingController::class, 'index'])->name('log');
     Route::get('records', [DataListController::class, 'index'])->name('records.index');
-    
+    Route::get('reports', [ConsultationController::class, 'reports'])->name('consultation.reports');
     Route::get('consultation', [ConsultationController::class, 'index'])->name('consultation.index');
 
 });

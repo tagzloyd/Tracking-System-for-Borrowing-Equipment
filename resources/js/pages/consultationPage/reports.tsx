@@ -1,13 +1,12 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
 import React, { useEffect } from 'react';
-import { MagnifyingGlassIcon, UserCircleIcon, AcademicCapIcon, BuildingOffice2Icon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, UserCircleIcon, PrinterIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { BreadcrumbItem } from '@/types';
 import axios from 'axios';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Consultation', href: '/consultation' },
-    
+    { title: 'Reports', href: '/reports' },
 ];
 
 const departments = ["All Departments", "Computer Science", "Engineering", "Business", "Arts", "Science"];
@@ -29,6 +28,25 @@ interface ConsultationUser {
   contact?: string;
   type: 'student' | 'outsider';
 }
+
+type CSVRow = {
+  'Date & Time': string;
+  'Name': string;
+} & (
+  | {
+      'Student ID': string;
+      'Department': string;
+      'Course': string;
+    }
+  | {
+      'Email': string;
+      'Address': string;
+      'Office': string;
+    }
+) & {
+  'Contact': string;
+  'Purpose': string;
+};
 
 export default function ConsultationPage() {
   const [search, setSearch] = React.useState('');
@@ -87,91 +105,140 @@ export default function ConsultationPage() {
 
   const [activeTab, setActiveTab] = React.useState<'student' | 'outsider'>('student');
 
+  const exportToCSV = () => {
+    const headers = activeTab === 'student' 
+      ? ['Date & Time', 'Name', 'Student ID', 'Department', 'Course', 'Contact', 'Purpose']
+      : ['Date & Time', 'Name', 'Email', 'Address', 'Office', 'Contact', 'Purpose'];
+    
+    const data = filteredVisitors
+      .filter(v => v.type === activeTab)
+      .map(visitor => ({
+        'Date & Time': formatDate(visitor.created_at),
+        'Name': visitor.name,
+        ...(activeTab === 'student' ? {
+          'Student ID': visitor.student_id || '-',
+          'Department': visitor.department || '-',
+          'Course': visitor.course || '-',
+        } : {
+          'Email': visitor.email || '-',
+          'Address': visitor.address || '-',
+          'Office': visitor.affiliation_or_office || '-',
+        }),
+        'Contact': visitor.phone || visitor.contact || '-',
+        'Purpose': visitor.purpose || '-'
+      } as CSVRow));
+
+    let csvContent = headers.join(',') + '\n';
+    
+    data.forEach(row => {
+      csvContent += headers.map(header => {
+        const value = (row as Record<string, string>)[header].toString().replace(/"/g, '""');
+        return value.includes(',') ? `"${value}"` : value;
+      }).join(',') + '\n';
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${activeTab}_visitors_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const printTable = () => {
+    const printWindow = window.open('', '', 'width=800,height=600');
+    if (!printWindow) return;
+    
+    const title = `${activeTab === 'student' ? 'Student' : 'External Visitor'} Consultation Records`;
+    const styles = `
+      <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #111827; font-size: 1.5rem; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background-color: #f9fafb; text-align: left; padding: 8px; border: 1px solid #e5e7eb; }
+        td { padding: 8px; border: 1px solid #e5e7eb; }
+        .text-center { text-align: center; }
+        .truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+      </style>
+    `;
+    
+    let tableContent = `
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Name</th>
+            ${activeTab === 'student' 
+              ? '<th>Student ID</th><th>Department</th><th>Course</th>' 
+              : '<th>Email</th><th>Address</th><th>Office</th>'}
+            <th>Contact</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    const visitorsToPrint = filteredVisitors.filter(v => v.type === activeTab);
+    
+    if (visitorsToPrint.length === 0) {
+      tableContent += `
+        <tr>
+          <td colspan="${activeTab === 'student' ? 7 : 7}" class="text-center">No visitors found matching your criteria</td>
+        </tr>
+      `;
+    } else {
+      visitorsToPrint.forEach(visitor => {
+        tableContent += `
+          <tr>
+            <td>${formatDate(visitor.created_at)}</td>
+            <td>${visitor.name}</td>
+            ${activeTab === 'student' 
+              ? `<td>${visitor.student_id || '-'}</td><td>${visitor.department || '-'}</td><td>${visitor.course || '-'}</td>` 
+              : `<td>${visitor.email || '-'}</td><td>${visitor.address || '-'}</td><td>${visitor.affiliation_or_office || '-'}</td>`}
+            <td>${visitor.phone || visitor.contact || '-'}</td>
+            <td class="truncate">${visitor.purpose || '-'}</td>
+          </tr>
+        `;
+      });
+    }
+
+    tableContent += `
+        </tbody>
+      </table>
+      <p style="margin-top: 20px; font-size: 0.8rem; color: #6b7280;">
+        Generated on ${new Date().toLocaleString()}
+      </p>
+    `;
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>${title}</title>
+          ${styles}
+        </head>
+        <body>
+          <h1>${title}</h1>
+          ${tableContent}
+          <script>
+            setTimeout(() => {
+              window.print();
+              window.close();
+            }, 200);
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Visitor Management System" />
-      <div className="px-4 sm:px-6 lg:px-8 py-8 bg-gray-50 min-h-screen">
+        <div className="px-4 sm:px-6 lg:px-8 py-8 bg-gray-50 min-h-screen">
         <div className="max-w-7xl mx-auto">
-          {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Visitor Management System</h1>
-            <p className="text-gray-600 mt-2">Track and manage all visitor consultations</p>
-          </div>
-
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-blue-100 text-blue-600">
-                  <UserCircleIcon className="h-6 w-6" />
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-sm font-medium text-gray-500">Total Visitors</h3>
-                  <p className="text-2xl font-semibold text-gray-900">{visitors.length}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-indigo-100 text-indigo-600">
-                  <AcademicCapIcon className="h-6 w-6" />
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-sm font-medium text-gray-500">Students</h3>
-                  <p className="text-2xl font-semibold text-gray-900">
-                    {visitors.filter(v => v.type === 'student').length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-green-100 text-green-600">
-                  <BuildingOffice2Icon className="h-6 w-6" />
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-sm font-medium text-gray-500">External Visitors</h3>
-                  <p className="text-2xl font-semibold text-gray-900">
-                    {visitors.filter(v => v.type === 'outsider').length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-purple-100 text-purple-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-sm font-medium text-gray-500">Departments</h3>
-                  <p className="text-2xl font-semibold text-gray-900">
-                    {new Set(visitors.map(v => v.department)).size - 1}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Filter Section */}
           <div className="bg-white rounded-lg shadow p-6 mb-8">
             <div className="md:flex md:items-center md:justify-between mb-4">
@@ -243,6 +310,24 @@ export default function ConsultationPage() {
                   onChange={(e) => setDateTo(e.target.value)}
                 />
               </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="mt-4 flex justify-end space-x-3">
+              <button
+                onClick={exportToCSV}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <ArrowDownTrayIcon className="-ml-1 mr-2 h-5 w-5 text-gray-500" />
+                Export CSV
+              </button>
+              <button
+                onClick={printTable}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <PrinterIcon className="-ml-1 mr-2 h-5 w-5 text-gray-500" />
+                Print
+              </button>
             </div>
           </div>
 
@@ -364,7 +449,7 @@ export default function ConsultationPage() {
             </div>
           </div>
         </div>
-      </div>
+        </div>
     </AppLayout>
   );
 }

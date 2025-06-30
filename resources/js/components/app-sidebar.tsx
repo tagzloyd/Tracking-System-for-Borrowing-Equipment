@@ -32,6 +32,11 @@ const toolsNavItems: NavItem[] = [
         title: 'Consultation',
         href: '/consultation',
         icon: HeartPulseIcon,
+    },
+    {
+        title: 'Reports',
+        href: '/reports',
+        icon: BookOpen,
     }
 ];
 

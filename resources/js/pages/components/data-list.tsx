@@ -3,12 +3,9 @@ import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import React from 'react';
 import axios from 'axios';
-import { MagnifyingGlassIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline'; // If using Heroicons (recommended for Inertia projects)
+import { MagnifyingGlassIcon, ChevronUpDownIcon, PrinterIcon, ArrowDownTrayIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import { title } from 'process';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Records', href: '/records' },
@@ -37,6 +34,8 @@ export default function TrackingPage() {
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
     const [search, setSearch] = React.useState('');
+    const [startDate, setStartDate] = React.useState<string>('');
+    const [endDate, setEndDate] = React.useState<string>('');
 
     // Paging
     const [page, setPage] = React.useState(0);
@@ -45,7 +44,6 @@ export default function TrackingPage() {
     // Sorting
     const [sortBy, setSortBy] = React.useState<string>('start_time');
     const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('desc');
-    const [statusFilter, setStatusFilter] = React.useState<string>('Returned'); // Default to Returned
 
     React.useEffect(() => {
         const fetchTrackings = async () => {
@@ -64,11 +62,24 @@ export default function TrackingPage() {
         fetchTrackings();
     }, [activeTab]);
 
-    // Filtered data based on search AND status filter
+    // Filter data to only show Returned status and within date range
     const filteredData = trackings.filter(tracking => {
+        // Only show returned items
+        if (tracking.status !== 'Returned') return false;
+        
+        // Filter by date range if dates are selected
+        if (startDate || endDate) {
+            const returnDate = tracking.end_time ? new Date(tracking.end_time) : null;
+            if (!returnDate) return false;
+            
+            const start = startDate ? new Date(startDate) : null;
+            const end = endDate ? new Date(endDate) : null;
+            
+            if (start && returnDate < start) return false;
+            if (end && returnDate > end) return false;
+        }
+        
         const q = search.toLowerCase();
-        // Filter by status
-        if (statusFilter !== 'All' && tracking.status !== statusFilter) return false;
         return (
             tracking.name.toLowerCase().includes(q) ||
             (tracking.student_id && tracking.student_id.toLowerCase().includes(q)) ||
@@ -130,59 +141,124 @@ export default function TrackingPage() {
         });
     }
 
-    function getStatus(tracking: Tracking) {
-        // Returned is always final
-        if (tracking.status === 'Returned') return 'Returned';
-        // If end_time is not set, it's still borrowed
-        if (!tracking.end_time) return 'Borrowed';
-        // If end_time is set and now is past end_time, it's deadline
-        const now = new Date();
-        const end = new Date(tracking.end_time);
-        if (now > end) return 'Deadline';
-        // If end_time is set but not yet due, still borrowed
-        return 'Borrowed';
-    }
-
-    const handleStatusUpdate = async (id: number, type: 'student' | 'outsider', newStatus: string) => {
-        try {
-            await axios.patch(`/api/tracking/${id}/status`, { status: newStatus, type });
-            setTrackings(prev =>
-                prev.map(t =>
-                    t.id === id
-                        ? {
-                            ...t,
-                            status: newStatus,
-                            end_time: newStatus === 'Returned' ? new Date().toISOString() : t.end_time
-                        }
-                        : t
-                )
-            );
-            window.dispatchEvent(new Event('dashboard-refresh'));
-        } catch (err: any) {
-            alert('Failed to update status');
-        }
-    };
-
     // Export to CSV
     const handleExportCSV = () => {
-        // Only export the filtered and paginated data as shown in the table
-        const exportData = paginatedData.map(tracking => ({
+        const exportData = sortedData.map(tracking => ({
             ...(activeTab === 'students' && {
-                'Student ID': tracking.student_id,
-                Department: tracking.department,
-                Course: tracking.course,
-                Year: tracking.year,
+                'Student ID': tracking.student_id || '-',
+                'Department': tracking.department || '-',
+                'Course': tracking.course || '-',
+                'Year': tracking.year || '-',
             }),
-            Name: tracking.name,
-            Contact: tracking.phone,
-            Email: tracking.email,
-            Equipment: tracking.equipment_name,
+            'Name': tracking.name,
+            'Contact': tracking.phone || '-',
+            'Email': tracking.email,
+            'Equipment': tracking.equipment_name || '-',
             'Start Time': formatDate(tracking.start_time),
             'End Time': tracking.end_time ? formatDate(tracking.end_time) : 'N/A',
+            'Return Date': tracking.end_time ? formatDate(tracking.end_time) : 'N/A'
         }));
+
         const csv = Papa.unparse(exportData);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        saveAs(blob, 'Records Of People Borrowed Items.csv');
+        saveAs(blob, `${activeTab}_returned_records_${new Date().toISOString().slice(0, 10)}.csv`);
+    };
+
+    // Print function
+    const handlePrint = () => {
+        const printWindow = window.open('', '', 'width=1000,height=600');
+        if (!printWindow) return;
+        
+        const title = `${activeTab === 'students' ? 'Student' : 'Outsider'} Returned Equipment Records`;
+        const dateRangeText = startDate || endDate 
+            ? `(Date Range: ${startDate ? formatDate(startDate) : 'Start'} to ${endDate ? formatDate(endDate) : 'End'})`
+            : '';
+        
+        const styles = `
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                h1 { color: #111827; font-size: 1.5rem; margin-bottom: 5px; }
+                .date-range { color: #6b7280; font-size: 0.9rem; margin-bottom: 15px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                th { background-color: #f9fafb; text-align: left; padding: 8px; border: 1px solid #e5e7eb; }
+                td { padding: 8px; border: 1px solid #e5e7eb; }
+                .text-center { text-align: center; }
+            </style>
+        `;
+        
+        let tableContent = `
+            <table>
+                <thead>
+                    <tr>
+                        ${activeTab === 'students' 
+                            ? '<th>Student ID</th><th>Department</th><th>Course</th><th>Year</th>' 
+                            : ''}
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Email</th>
+                        <th>Equipment</th>
+                        <th>Start Time</th>
+                        <th>Return Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        if (sortedData.length === 0) {
+            tableContent += `
+                <tr>
+                    <td colspan="${activeTab === 'students' ? 9 : 5}" class="text-center">No returned records found</td>
+                </tr>
+            `;
+        } else {
+            sortedData.forEach(tracking => {
+                tableContent += `
+                    <tr>
+                        ${activeTab === 'students' 
+                            ? `<td>${tracking.student_id || '-'}</td>
+                               <td>${tracking.department || '-'}</td>
+                               <td>${tracking.course || '-'}</td>
+                               <td>${tracking.year || '-'}</td>` 
+                            : ''}
+                        <td>${tracking.name}</td>
+                        <td>${tracking.phone || '-'}</td>
+                        <td>${tracking.email}</td>
+                        <td>${tracking.equipment_name || '-'}</td>
+                        <td>${formatDate(tracking.start_time)}</td>
+                        <td>${tracking.end_time ? formatDate(tracking.end_time) : 'N/A'}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        tableContent += `
+                </tbody>
+            </table>
+            <p style="margin-top: 20px; font-size: 0.8rem; color: #6b7280;">
+                Generated on ${new Date().toLocaleString()}
+            </p>
+        `;
+
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>${title}</title>
+                    ${styles}
+                </head>
+                <body>
+                    <h1>${title}</h1>
+                    ${dateRangeText ? `<div class="date-range">${dateRangeText}</div>` : ''}
+                    ${tableContent}
+                    <script>
+                        setTimeout(() => {
+                            window.print();
+                            window.close();
+                        }, 200);
+                    </script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
     };
 
     // Sorting handler
@@ -195,23 +271,36 @@ export default function TrackingPage() {
         }
     };
 
-    // Status filter options
-    const statusOptions = ['All', 'Returned', 'Borrowed', 'Deadline'];
+    // Clear date filters
+    const clearDateFilters = () => {
+        setStartDate('');
+        setEndDate('');
+        setPage(0);
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title='Records' />
+            <Head title='Returned Records' />
             <div className="w-full px-2 sm:px-4 py-4">
-                {/* Export Buttons */}
+                {/* Export and Print Buttons */}
                 <div className="flex gap-2 mb-4">
                     <button
                         onClick={handleExportCSV}
-                        className="px-3 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700 text-sm"
+                        className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
+                        <ArrowDownTrayIcon className="-ml-1 mr-2 h-5 w-5 text-gray-500" />
                         Export CSV
                     </button>
+                    <button
+                        onClick={handlePrint}
+                        className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        <PrinterIcon className="-ml-1 mr-2 h-5 w-5 text-gray-500" />
+                        Print
+                    </button>
                 </div>
-                {/* Search and Filter Bar */}
+                
+                {/* Search and Date Filter Bar */}
                 <div className="flex flex-col sm:flex-row items-center mb-4 gap-2">
                     <div className="relative w-full max-w-xs">
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -220,7 +309,7 @@ export default function TrackingPage() {
                         <input
                             type="text"
                             className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                            placeholder="Search by name, ID, email, equipment..."
+                            placeholder="Search returned records..."
                             value={search}
                             onChange={e => {
                                 setSearch(e.target.value);
@@ -228,19 +317,50 @@ export default function TrackingPage() {
                             }}
                         />
                     </div>
-                    <select
-                        className="border rounded px-2 py-2 text-sm ml-0 sm:ml-2"
-                        value={statusFilter}
-                        onChange={e => {
-                            setStatusFilter(e.target.value);
-                            setPage(0);
-                        }}
-                    >
-                        {statusOptions.map(opt => (
-                            <option key={opt} value={opt}>{opt}</option>
-                        ))}
-                    </select>
+                    
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <div className="relative w-full sm:w-auto">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                                <CalendarIcon className="h-5 w-5 text-gray-400" />
+                            </span>
+                            <input
+                                type="date"
+                                className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                value={startDate}
+                                onChange={e => {
+                                    setStartDate(e.target.value);
+                                    setPage(0);
+                                }}
+                                max={endDate || undefined}
+                            />
+                        </div>
+                        <span className="text-gray-400">to</span>
+                        <div className="relative w-full sm:w-auto">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                                <CalendarIcon className="h-5 w-5 text-gray-400" />
+                            </span>
+                            <input
+                                type="date"
+                                className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                value={endDate}
+                                onChange={e => {
+                                    setEndDate(e.target.value);
+                                    setPage(0);
+                                }}
+                                min={startDate || undefined}
+                            />
+                        </div>
+                        {(startDate || endDate) && (
+                            <button
+                                onClick={clearDateFilters}
+                                className="px-2 py-1 text-sm text-gray-600 hover:text-gray-800"
+                            >
+                                Clear
+                            </button>
+                        )}
+                    </div>
                 </div>
+                
                 <div className="mb-4 border-b border-gray-200">
                     <ul className="flex flex-wrap -mb-px">
                         <li className="mr-2">
@@ -262,6 +382,7 @@ export default function TrackingPage() {
                         </li>
                     </ul>
                 </div>
+                
                 {error && <div className="mb-2 text-red-600">{error}</div>}
 
                 <div className="w-full overflow-x-auto rounded-lg shadow border border-gray-200 bg-white">
@@ -339,7 +460,7 @@ export default function TrackingPage() {
                                     className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap cursor-pointer select-none"
                                     onClick={() => handleSort('end_time')}
                                 >
-                                    End Time
+                                    Return Date
                                     <ChevronUpDownIcon className="inline h-4 w-4 ml-1 text-gray-400" />
                                 </th>
                             </tr>
@@ -347,7 +468,7 @@ export default function TrackingPage() {
                         <tbody className="bg-white divide-y divide-gray-100">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={activeTab === 'students' ? 11 : 7} className="py-12 text-center">
+                                    <td colSpan={activeTab === 'students' ? 10 : 6} className="py-12 text-center">
                                         <div className="flex justify-center items-center">
                                             <svg className="animate-spin h-8 w-8 text-blue-600 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -359,35 +480,32 @@ export default function TrackingPage() {
                                 </tr>
                             ) : paginatedData.length === 0 ? (
                                 <tr>
-                                    <td colSpan={activeTab === 'students' ? 11 : 7} className="py-8 text-center text-gray-500">
-                                        No records found.
+                                    <td colSpan={activeTab === 'students' ? 10 : 6} className="py-8 text-center text-gray-500">
+                                        No returned records found{startDate || endDate ? ' for selected date range' : ''}.
                                     </td>
                                 </tr>
                             ) : (
-                                paginatedData.map((tracking, idx) => {
-                                    const status = getStatus(tracking);
-                                    return (
-                                        <tr
-                                            key={tracking.id}
-                                            className={`transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-blue-50/50'} hover:bg-blue-100`}
-                                        >
-                                            {activeTab === 'students' && (
-                                                <>
-                                                    <td className="px-4 py-3 whitespace-nowrap font-mono text-xs text-gray-700">{tracking.student_id}</td>
-                                                    <td className="px-4 py-3 whitespace-nowrap">{tracking.department || '-'}</td>
-                                                    <td className="px-4 py-3 whitespace-nowrap">{tracking.course || '-'}</td>
-                                                    <td className="px-4 py-3 whitespace-nowrap">{tracking.year || '-'}</td>
-                                                </>
-                                            )}
-                                            <td className="px-4 py-3 whitespace-nowrap font-medium">{tracking.name}</td>
-                                            <td className="px-4 py-3 whitespace-nowrap">{tracking.phone || '-'}</td>
-                                            <td className="px-4 py-3 whitespace-nowrap">{tracking.email}</td>
-                                            <td className="px-4 py-3 whitespace-nowrap">{tracking.equipment_name || '-'}</td>
-                                            <td className="px-4 py-3 whitespace-nowrap">{formatDate(tracking.start_time)}</td>
-                                            <td className="px-4 py-3 whitespace-nowrap">{tracking.end_time ? formatDate(tracking.end_time) : <span className="italic text-gray-400">N/A</span>}</td>
-                                        </tr>
-                                    );
-                                })
+                                paginatedData.map((tracking, idx) => (
+                                    <tr
+                                        key={tracking.id}
+                                        className={`transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-blue-50/50'} hover:bg-blue-100`}
+                                    >
+                                        {activeTab === 'students' && (
+                                            <>
+                                                <td className="px-4 py-3 whitespace-nowrap font-mono text-xs text-gray-700">{tracking.student_id}</td>
+                                                <td className="px-4 py-3 whitespace-nowrap">{tracking.department || '-'}</td>
+                                                <td className="px-4 py-3 whitespace-nowrap">{tracking.course || '-'}</td>
+                                                <td className="px-4 py-3 whitespace-nowrap">{tracking.year || '-'}</td>
+                                            </>
+                                        )}
+                                        <td className="px-4 py-3 whitespace-nowrap font-medium">{tracking.name}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap">{tracking.phone || '-'}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap">{tracking.email}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap">{tracking.equipment_name || '-'}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap">{formatDate(tracking.start_time)}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap">{tracking.end_time ? formatDate(tracking.end_time) : 'N/A'}</td>
+                                    </tr>
+                                ))
                             )}
                         </tbody>
                     </table>

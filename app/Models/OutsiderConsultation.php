@@ -20,6 +20,7 @@ class OutsiderConsultation extends Model
         'address', // Address of the outsider
         'affiliation_or_office',
         'purpose', // Purpose of consultation
+        'appointment_date' // Appointment date for the consultation
     ];
 
 }
