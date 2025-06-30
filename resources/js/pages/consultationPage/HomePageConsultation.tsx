@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Home.css';
+import { Head } from '@inertiajs/react';
 
 const Home = () => {
+  
   // Form state
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -122,6 +124,10 @@ const Home = () => {
   return (
     <div className="consultation-container">
       {/* Navigation */}
+      <Head  title="Welcome">
+        <link rel="preconnect" href="https://fonts.bunny.net" />
+        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+      </Head>
       <nav className="navbar bg-white shadow-md">
         <div className="navbar-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-30">
@@ -148,6 +154,7 @@ const Home = () => {
                 <li><a href="#services" className="text-gray-700 hover:text-green-600 transition duration-300">Services</a></li>
                 {/* <li><a href="#contact" className="text-gray-700 hover:text-green-600 transition duration-300">Contact</a></li> */}
                 <li><a href="#contact" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300">Contact Us</a></li>
+                <li><a href={route('login')} className="text-gray-700 hover:text-green-600 transition duration-300">Admin</a></li>
               </ul>
             </div>
           </div>
