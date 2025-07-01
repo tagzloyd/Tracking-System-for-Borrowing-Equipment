@@ -6,7 +6,7 @@ use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\DataListController;
 use App\Http\Controllers\ConsultationController;
 
-Route::get('/admin', function () {
+Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
@@ -26,7 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('Attendance/outsider', [TrackingController::class, 'outsider'])->name('tracking.outsider');
     Route::get('Attendance', [TrackingController::class, 'attendance'])->name('tracking.main');
     Route::get('consultation/student', [ConsultationController::class, 'studentConsultation'])->name('consultation.student');
-    Route::get('/', [ConsultationController::class, 'HomePageConsultation'])->name('consultation.home');
+    Route::get('/home', [ConsultationController::class, 'HomePageConsultation'])->name('consultation.home');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

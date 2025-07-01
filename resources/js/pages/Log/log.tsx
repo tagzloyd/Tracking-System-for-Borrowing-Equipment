@@ -78,7 +78,7 @@ export default function LogForm() {
             <header className="bg-white shadow-sm flex-shrink-0 z-10">
                 <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                     <div className="flex items-center">
-                        <a href={route('consultation.home')} className="flex items-center">
+                        <a href={route('tracking.main')} className="flex items-center">
                             <img
                                 src="https://www.carsu.edu.ph/wp-content/uploads/2024/10/CSU-logo-2-black-text-1-1.svg"
                                 alt="CSU Logo"

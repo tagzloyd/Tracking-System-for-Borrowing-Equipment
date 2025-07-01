@@ -29,7 +29,7 @@ const mainNavItems: NavItem[] = [
 
 const toolsNavItems: NavItem[] = [
     {
-        title: 'Consultation',
+        title: 'List of Consultees',
         href: '/consultation',
         icon: HeartPulseIcon,
     },

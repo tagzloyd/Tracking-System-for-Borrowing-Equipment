@@ -59,7 +59,7 @@ class ConsultationController extends Controller
             'address' => 'required|string|max:255',
             'affiliation_or_office' => 'required|string|max:255',
             'purpose' => 'required|string|max:500',
-            'appointment_date' => 'required|date_format:Y-m-d\TH:i', // Matches datetime-local input format
+            'appointment_date' => 'required|date_format:Y-m-d\TH:i',
         ]);
 
         // Convert the datetime format to match database

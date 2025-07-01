@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Home.css';
 import { Head } from '@inertiajs/react';
+import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline';
 
 const Home = () => {
   // Modal state
@@ -15,6 +16,11 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [userType, setUserType] = useState('student');
   const [appointmentDate, setAppointmentDate] = useState('');
+  
+  // Calendar view states
+  const [showCalendarView, setShowCalendarView] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
   
   // Student-specific fields
   const [studentId, setStudentId] = useState('');
@@ -52,6 +58,14 @@ const Home = () => {
     }
   ];
 
+  // Mock available time slots
+  const timeSlots = [
+    '09:00', '09:30', '10:00', '10:30', 
+    '11:00', '11:30', '01:00', '01:30',
+    '02:00', '02:30', '03:00', '03:30',
+    '04:00', '04:30'
+  ];
+
   // Auto-rotate slides
   useEffect(() => {
     const interval = setInterval(() => {
@@ -60,17 +74,134 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [slides.length]);
 
+  // Get days in month
+  const getDaysInMonth = (year: number, month: number) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
+
+  // Get first day of month
+  const getFirstDayOfMonth = (year: number, month: number) => {
+    return new Date(year, month, 1).getDay();
+  };
+
+  // Navigate months
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    const newMonth = new Date(currentMonth);
+    if (direction === 'prev') {
+      newMonth.setMonth(newMonth.getMonth() - 1);
+    } else {
+      newMonth.setMonth(newMonth.getMonth() + 1);
+    }
+    setCurrentMonth(newMonth);
+  };
+
+  // Handle date selection
+  const handleDateClick = (day: number) => {
+    const date = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth(),
+      day
+    );
+    setAppointmentDate(date.toISOString().split('T')[0]);
+    setShowCalendarView(true);
+    setSelectedTime(null);
+  };
+
+  // Handle time slot selection
+  const handleTimeSlotSelect = (time: string) => {
+  setSelectedTime(time);
+  if (appointmentDate) {
+    // Split the time into hours and minutes
+    const [hours, minutes] = time.split(':').map(Number);
+    
+    // Create a new Date object from the selected date
+    const dateTime = new Date(appointmentDate);
+    
+    // Set the hours and minutes
+    dateTime.setHours(hours, minutes, 0, 0);
+    
+    // Convert to ISO string and remove milliseconds/timezone
+    const isoString = dateTime.toISOString().slice(0, 16);
+    setAppointmentDate(isoString);
+  }
+};
+
+  // Render calendar days
+  const renderCalendarDays = () => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const daysInMonth = getDaysInMonth(year, month);
+    const firstDayOfMonth = getFirstDayOfMonth(year, month);
+    const days = [];
+
+    // Previous month days
+    const prevMonthDays = getDaysInMonth(year, month - 1);
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      days.push(
+        <div 
+          key={`prev-${i}`} 
+          className="h-12 p-1 text-center text-gray-400"
+        >
+          {prevMonthDays - firstDayOfMonth + i + 1}
+        </div>
+      );
+    }
+
+    // Current month days
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const isToday = date.toDateString() === new Date().toDateString();
+      const isSelected = appointmentDate && new Date(appointmentDate).toDateString() === date.toDateString();
+      const isPast = date < new Date() && !isToday;
+
+      days.push(
+        <div
+          key={`day-${day}`}
+          onClick={() => !isPast && handleDateClick(day)}
+          className={`h-12 p-1 text-center cursor-pointer flex items-center justify-center
+            ${isSelected ? 'bg-green-100 rounded-full' : ''}
+            ${isToday ? 'font-bold text-green-600' : ''}
+            ${isPast ? 'text-gray-400 cursor-not-allowed' : 'hover:bg-gray-100'}
+          `}
+        >
+          {day}
+        </div>
+      );
+    }
+
+    // Next month days
+    const daysToShow = 42 - days.length; // 6 rows x 7 days
+    for (let i = 1; i <= daysToShow; i++) {
+      days.push(
+        <div 
+          key={`next-${i}`} 
+          className="h-12 p-1 text-center text-gray-400"
+        >
+          {i}
+        </div>
+      );
+    }
+
+    return days;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLoading) return;
     
     setIsLoading(true);
     
+    // Ensure the date is in the correct format
+    let formattedAppointmentDate = appointmentDate;
+    if (appointmentDate && !appointmentDate.includes('T')) {
+      // If it's just a date without time, add a default time
+      formattedAppointmentDate = `${appointmentDate}T00:00`;
+    }
     const formData = {
       name,
       email,
       purpose: message,
-      appointment_date: appointmentDate,
+      appointment_date: formattedAppointmentDate, 
       userType,
       ...(userType === 'student' ? {
         student_id: studentId,
@@ -112,9 +243,11 @@ const Home = () => {
         setAddress('');
         setAffiliationOrOffice('');
         setAppointmentDate('');
+        setSelectedTime(null);
         setTimeout(() => {
           setIsSubmitted(false);
           setIsModalOpen(false);
+          setShowCalendarView(false);
         }, 3000);
       }
     } catch (error) {
@@ -130,10 +263,28 @@ const Home = () => {
     }
   };
 
+  const resetForm = () => {
+    setName('');
+    setEmail('');
+    setMessage('');
+    setStudentId('');
+    setDepartment('');
+    setCourse('');
+    setYear('');
+    setPhone('');
+    setAddress('');
+    setAffiliationOrOffice('');
+    setAppointmentDate('');
+    setSelectedTime(null);
+    setIsSubmitted(false);
+    setIsModalOpen(false);
+    setShowCalendarView(false);
+  };
+
   return (
     <div className="consultation-container">
       {/* Navigation */}
-      <Head  title="Welcome">
+      <Head title="Welcome">
         <link rel="preconnect" href="https://fonts.bunny.net" />
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
       </Head>
@@ -411,7 +562,7 @@ const Home = () => {
                 </div>
                 <div>
                   <h4 className="font-semibold">Sarah Johnson</h4>
-                  <p className="text-green-100 text-sm">Career Counseling Client</p>
+                  <p className="text-green-100 text-sm">ACTIVE PARTNERS</p>
                 </div>
               </div>
               <p className="italic">"The career guidance I received was transformative. I now have clarity and confidence in my professional path."</p>
@@ -575,12 +726,18 @@ const Home = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div 
             className="absolute inset-0 bg-black bg-opacity-50"
-            onClick={() => setIsModalOpen(false)}
+            onClick={() => {
+              setIsModalOpen(false);
+              setShowCalendarView(false);
+            }}
           ></div>
           
           <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <button
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => {
+                setIsModalOpen(false);
+                setShowCalendarView(false);
+              }}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -600,9 +757,108 @@ const Home = () => {
                     <span>Thank you for your message! We'll get back to you within 24 hours.</span>
                   </div>
                 </div>
+              ) : showCalendarView ? (
+                <div className="space-y-6">
+                  {/* Calendar View */}
+                  <div className="bg-white rounded-lg shadow">
+                    <div className="flex items-center justify-between p-4 border-b">
+                      <button 
+                        onClick={() => navigateMonth('prev')}
+                        className="p-2 rounded-full hover:bg-gray-100"
+                      >
+                        &lt;
+                      </button>
+                      <h3 className="font-semibold">
+                        {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                      </h3>
+                      <button 
+                        onClick={() => navigateMonth('next')}
+                        className="p-2 rounded-full hover:bg-gray-100"
+                      >
+                        &gt;
+                      </button>
+                    </div>
+                    
+                    {/* Weekday Headers */}
+                    <div className="grid grid-cols-7 gap-1 p-2">
+                      {['S', 'M', 'T', 'W', 'TH', 'F', 'ST'].map(day => (
+                        <div key={day} className="text-center font-medium text-sm py-1">
+                          {day}
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Calendar Grid */}
+                    <div className="grid grid-cols-7 gap-1">
+                      {renderCalendarDays()}
+                    </div>
+                  </div>
+
+                  {/* Time Slot Selection */}
+                  {appointmentDate && (
+                    <div className="border-t pt-6">
+                      <h3 className="font-semibold mb-4 flex items-center">
+                        <ClockIcon className="h-5 w-5 mr-2 text-green-600" />
+                        Available times for {new Date(appointmentDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                      </h3>
+
+                      <div className="grid grid-cols-3 gap-2">
+                        {timeSlots.map((time) => (
+                          <button
+                            key={time}
+                            onClick={() => handleTimeSlotSelect(time)}
+                            className={`py-2 px-3 rounded-md text-sm border
+                              ${selectedTime === time 
+                                ? 'bg-green-600 text-white border-green-600' 
+                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                              }
+                            `}
+                          >
+                            {time}
+                          </button>
+                        ))}
+                      </div>
+
+                      {selectedTime && (
+                        <div className="mt-6">
+                          <p className="text-sm mb-4">
+                            Selected appointment: {new Date(appointmentDate).toLocaleDateString()} at {selectedTime}
+                          </p>
+                          <button
+                            onClick={() => setShowCalendarView(false)}
+                            className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md"
+                          >
+                            Continue to Appointment Form
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Form fields - same as before */}
+                  <div className="form-group">
+                    <label htmlFor="appointmentDate" className="block text-sm font-medium text-gray-700 mb-1">Appointment Date & Time</label>
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        id="appointmentDate"
+                        value={appointmentDate ? 
+                          `${new Date(appointmentDate).toLocaleDateString()} at ${selectedTime || ''}` : 
+                          'Not selected'}
+                        readOnly
+                        className="w-full px-4 py-3 border border-gray-300 rounded-l-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300 bg-gray-50"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCalendarView(true)}
+                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-r-md transition duration-300 flex items-center justify-center"
+                      >
+                        <CalendarIcon className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="form-group">
                     <label className="block text-sm font-medium text-gray-700 mb-2">I am a:</label>
                     <div className="flex space-x-4">
@@ -667,19 +923,6 @@ const Home = () => {
                       onChange={(e) => setPhone(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
                       required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="appointmentDate" className="block text-sm font-medium text-gray-700 mb-1">Appointment Date & Time</label>
-                    <input
-                      type="datetime-local"
-                      id="appointmentDate"
-                      value={appointmentDate}
-                      onChange={(e) => setAppointmentDate(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
-                      required
-                      min={new Date().toISOString().slice(0, 16)}
                     />
                   </div>
 
@@ -784,7 +1027,7 @@ const Home = () => {
                   <button 
                     type="submit" 
                     className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-md transition duration-300 shadow-md"
-                    disabled={isLoading}
+                    disabled={isLoading || !appointmentDate}
                   >
                     {isLoading ? 'Sending...' : 'Send Message'}
                   </button>
@@ -795,7 +1038,7 @@ const Home = () => {
         </div>
       )}
 
-      {/* Footer - unchanged */}
+      {/* Footer */}
       <footer className="footer bg-gray-800 text-white py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
