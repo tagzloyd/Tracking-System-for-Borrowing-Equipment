@@ -17,6 +17,7 @@ interface ConsultationUser {
   name: string;
   email?: string;
   address?: string;
+  appointment_date?: string;
   phone?: string;
   affiliation_or_office?: string;
   purpose?: string;
@@ -68,6 +69,16 @@ export default function ConsultationPage() {
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
+    });
+  };
+
+  const formatAppointmentDate = (dateString: string | undefined) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
     });
   };
 
@@ -261,6 +272,9 @@ export default function ConsultationPage() {
                         Date & Time
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Appointment Date
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Name
                       </th>
                       {activeTab === 'student' ? (
@@ -299,7 +313,7 @@ export default function ConsultationPage() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredVisitors.filter(v => v.type === activeTab).length === 0 ? (
                       <tr>
-                        <td colSpan={activeTab === 'student' ? 8 : 8} className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                        <td colSpan={activeTab === 'student' ? 9 : 9} className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
                           No visitors found matching your criteria
                         </td>
                       </tr>
@@ -310,6 +324,9 @@ export default function ConsultationPage() {
                           <tr key={visitor.id} className="hover:bg-gray-50">
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {formatDate(visitor.created_at)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {formatAppointmentDate(visitor.appointment_date)}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">

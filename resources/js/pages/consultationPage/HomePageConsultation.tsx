@@ -459,17 +459,22 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Contact Section - modified with modal button */}
+      {/* Contact Section */}
       <section id="contact" className="contact-section py-20 bg-white">
-        <div className="section-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">Contact Us</h2>
             <div className="w-20 h-1 bg-green-600 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-600">Schedule a consultation with our agricultural technology experts</p>
+            <p className="text-lg text-gray-600">
+              Schedule a consultation with our agricultural technology experts
+            </p>
           </div>
-          <div className="contact-content grid md:grid-cols-2 gap-12">
-            <div className="contact-info">
+
+          <div className="grid md:grid-cols-2 gap-12">
+            {/* Contact Info Column */}
+            <div className="bg-gray-50 p-8 rounded-xl shadow-sm">
               <h3 className="text-2xl font-semibold text-gray-800 mb-6">Get in Touch</h3>
+              
               <div className="space-y-4">
                 <div className="flex items-start">
                   <div className="flex-shrink-0 bg-green-100 p-2 rounded-full mr-4">
@@ -479,9 +484,12 @@ const Home = () => {
                   </div>
                   <div>
                     <p className="text-gray-600 font-medium">Email</p>
-                    <a href="mailto:create@carsu.edu.ph" className="text-green-600 hover:text-green-700 transition duration-300">create@carsu.edu.ph</a>
+                    <a href="mailto:create@carsu.edu.ph" className="text-green-600 hover:text-green-700 transition duration-300">
+                      create@carsu.edu.ph
+                    </a>
                   </div>
                 </div>
+
                 <div className="flex items-start">
                   <div className="flex-shrink-0 bg-green-100 p-2 rounded-full mr-4">
                     <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -490,9 +498,12 @@ const Home = () => {
                   </div>
                   <div>
                     <p className="text-gray-600 font-medium">Phone</p>
-                    <a href="tel:09304529690" className="text-green-600 hover:text-green-700 transition duration-300">09304529690</a>
+                    <a href="tel:09304529690" className="text-green-600 hover:text-green-700 transition duration-300">
+                      09304529690
+                    </a>
                   </div>
                 </div>
+
                 <div className="flex items-start">
                   <div className="flex-shrink-0 bg-green-100 p-2 rounded-full mr-4">
                     <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -502,11 +513,13 @@ const Home = () => {
                   </div>
                   <div>
                     <p className="text-gray-600 font-medium">Address</p>
-                    <p className="text-gray-800">CReATe Office, 2nd Floor Hinang Building, Caraga State University-Main Campus Ampayon, Butuan City, Agusan del Norte 8600</p>
+                    <p className="text-gray-800">
+                      CReATe Office, 2nd Floor Hinang Building, Caraga State University-Main Campus Ampayon, Butuan City, Agusan del Norte 8600
+                    </p>
                   </div>
                 </div>
               </div>
-              
+
               <h3 className="text-xl font-semibold text-gray-800 mt-10 mb-4">Business Hours</h3>
               <div className="space-y-2">
                 <div className="flex justify-between border-b border-gray-100 pb-2">
@@ -523,14 +536,35 @@ const Home = () => {
                 </div>
               </div>
             </div>
-            
+
+            {/* Appointment Button Column */}
             <div className="flex flex-col items-center justify-center">
-              <button 
-                onClick={() => setIsModalOpen(true)}
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-md transition duration-300 shadow-md text-lg"
-              >
-                Schedule an Appointment
-              </button>
+              <div className="bg-gray-50 p-8 rounded-xl shadow-sm w-full h-full flex flex-col items-center justify-center">
+                <button 
+                  onClick={() => setIsModalOpen(true)}
+                  className="relative overflow-hidden group bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-3 px-8 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl active:shadow-md active:scale-95 text-lg"
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      className="h-5 w-5" 
+                      viewBox="0 0 20 20" 
+                      fill="currentColor"
+                    >
+                      <path 
+                        fillRule="evenodd" 
+                        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" 
+                        clipRule="evenodd" 
+                      />
+                    </svg>
+                    Schedule an Appointment
+                  </span>
+                  <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
+                </button>
+                <p className="mt-4 text-sm text-gray-500 text-center max-w-xs">
+                  Get expert consultation in minutes with our agricultural specialists
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -602,6 +636,7 @@ const Home = () => {
                     <input
                       type="text"
                       id="name"
+                      placeholder='e.g. Sada Haro'
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
@@ -614,6 +649,7 @@ const Home = () => {
                     <input
                       type="email"
                       id="email"
+                      placeholder='e.g. sadaharo@example.com'
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
@@ -626,6 +662,7 @@ const Home = () => {
                     <input
                       type="tel"
                       id="phone"
+                      placeholder='e.g. 09123456789'
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
@@ -653,6 +690,7 @@ const Home = () => {
                         <input
                           type="text"
                           id="studentId"
+                          placeholder='e.g. 201-00000'
                           value={studentId}
                           onChange={(e) => setStudentId(e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
@@ -665,6 +703,7 @@ const Home = () => {
                         <input
                           type="text"
                           id="department"
+                          placeholder='e.g. College of Computing and Information Sciences'
                           value={department}
                           onChange={(e) => setDepartment(e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
@@ -677,6 +716,7 @@ const Home = () => {
                         <input
                           type="text"
                           id="course"
+                          placeholder='e.g. Bachelor of Science in Information Technology'
                           value={course}
                           onChange={(e) => setCourse(e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
@@ -689,6 +729,7 @@ const Home = () => {
                         <input
                           type="text"
                           id="year"
+                          placeholder='1st Year'
                           value={year}
                           onChange={(e) => setYear(e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
@@ -705,6 +746,7 @@ const Home = () => {
                         <input
                           type="text"
                           id="address"
+                          placeholder='e.g. CReATe Office, 2nd Floor Hinang Building, Caraga State University-Main Campus Ampayon, Butuan City, Agusan del Norte 8600'
                           value={address}
                           onChange={(e) => setAddress(e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
@@ -717,6 +759,7 @@ const Home = () => {
                         <input
                           type="text"
                           id="affiliation_or_office"
+                          placeholder='e.g. Office of Admission and Scholarship'
                           value={affiliation_or_office}
                           onChange={(e) => setAffiliationOrOffice(e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
