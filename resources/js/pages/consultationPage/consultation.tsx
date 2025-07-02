@@ -176,11 +176,11 @@ export default function ConsultationPage() {
                 <div className="ml-4">
                   <h3 className="text-sm font-medium text-gray-500">Departments</h3>
                   <p className="text-2xl font-semibold text-gray-900">
-                    {new Set(visitors.map(v => v.department)).size - 1}
+                    {new Set(visitors.map(v => v.department)).size === 0 ? 'No Departments' : new Set(visitors.map(v => v.department)).size }
                   </p>
                 </div>
               </div>
-            </div>
+            </div>  
           </div>
 
           {/* Filter Section */}
