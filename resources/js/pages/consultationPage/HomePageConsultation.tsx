@@ -1066,6 +1066,7 @@ const Home = () => {
             </div>
           </div>
         </div>
+        nigger
       </footer>
     </div>
   );
