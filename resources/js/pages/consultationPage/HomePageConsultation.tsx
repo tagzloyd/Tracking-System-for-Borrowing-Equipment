@@ -281,18 +281,19 @@ const Home = () => {
     setShowCalendarView(false);
   };
 
+
   return (
     <div className="consultation-container">
-      {/* Navigation */}
+      {/* Navigation with subtle animation */}
       <Head title="Welcome">
         <link rel="preconnect" href="https://fonts.bunny.net" />
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
       </Head>
-      <nav className="navbar bg-white shadow-md">
+      <nav className="navbar bg-white shadow-md animate-fade-in-up">
         <div className="navbar-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-30">
             <div className="flex items-center">
-              <a href={route('consultation.home')} className="flex items-center">
+              <a href={route('consultation.home')} className="flex items-center hover:scale-[1.02] transition-transform duration-300">
                 <img
                   src="https://www.carsu.edu.ph/wp-content/uploads/2024/10/CSU-logo-2-black-text-1-1.svg"
                   alt="CSU Logo"
@@ -309,43 +310,56 @@ const Home = () => {
             </div>
             <div className="hidden md:block">
               <ul className="nav-links flex space-x-8">
-                <li><a href="#about" className="text-gray-700 hover:text-green-600 transition duration-300">About</a></li>
-                <li><a href="#services" className="text-gray-700 hover:text-green-600 transition duration-300">Services</a></li>
-                <li><a href="#contact" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-300">Contact Us</a></li>
-                <li><a href={route('login')} className="text-gray-700 hover:text-green-600 transition duration-300">Admin</a></li>
+                <li><a href="#about" className="text-gray-700 hover:text-green-600 transition-all duration-300 hover:underline underline-offset-4">About</a></li>
+                <li><a href="#services" className="text-gray-700 hover:text-green-600 transition-all duration-300 hover:underline underline-offset-4">Services</a></li>
+                <li><a href="#contact" className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-all duration-300 hover:shadow-md">Contact Us</a></li>
+                <li><a href={route('login')} className="text-gray-700 hover:text-green-600 transition-all duration-300 hover:underline underline-offset-4">Admin</a></li>
               </ul>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Carousel with Fixed Size */}
+      {/* Enhanced Hero Carousel */}
       <section id="home" className="hero-section relative bg-gradient-to-r from-green-50 to-green-100 h-[600px] overflow-hidden">
+        {/* Floating leaf decorations */}
+        <div className="absolute top-1/4 left-10 w-16 h-16 opacity-20 animate-float-leaf">
+          <svg viewBox="0 0 100 100" className="text-green-800">
+            <path fill="currentColor" d="M50,0 C60,20 80,30 80,50 C80,70 60,80 50,100 C40,80 20,70 20,50 C20,30 40,20 50,0 Z"/>
+          </svg>
+        </div>
+        
         {/* Slides container */}
-        <div className="relative w-full h-full" >
+        <div className="relative w-full h-full">
           {slides.map((slide, index) => (
             <div
               key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 flex items-center ${currentSlide === index ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+              className={`absolute inset-0 transition-all duration-1000 flex items-center ${currentSlide === index ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             >
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                 <div className="flex flex-col md:flex-row items-center gap-12">
-                  {/* Text content - fixed width */}
-                  <div className="md:w-1/2 text-center md:text-left">
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+                  {/* Text content */}
+                  <div className="md:w-1/2 text-center md:text-left space-y-6">
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6 animate-fade-in-up">
                       {slide.title}
                     </h1>
-                    <p className="text-xl text-gray-600 mb-8">
+                    <p className="text-xl text-gray-600 mb-8 animate-fade-in-up delay-100">
                       {slide.description}
                     </p>
+                    <button 
+                      className="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-lg animate-fade-in-up delay-200"
+                      onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                    >
+                      Get Started
+                    </button>
                   </div>
                   
-                  {/* Image container - fixed size */}
-                  <div className="md:w-1/2 h-[400px] flex items-center justify-center">
+                  {/* Image container */}
+                  <div className="md:w-1/2 h-[400px] flex items-center justify-center animate-fade-in-up delay-300">
                     <img
                       src={slide.image}
                       alt={slide.title}
-                      className="w-full h-full object-cover rounded-lg shadow-xl"
+                      className="w-full h-full object-cover rounded-lg shadow-xl transition-transform duration-500 hover:scale-105"
                     />
                   </div>
                 </div>
@@ -361,7 +375,7 @@ const Home = () => {
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`w-3 h-3 rounded-full ${currentSlide === index ? 'bg-green-600' : 'bg-gray-300'}`}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${currentSlide === index ? 'bg-green-600 scale-125' : 'bg-gray-300'}`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
@@ -371,7 +385,7 @@ const Home = () => {
         {/* Navigation arrows */}
         <button 
           onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 p-2 rounded-full shadow-md z-10"
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 p-3 rounded-full shadow-md z-10 transition-all duration-300 hover:scale-110"
           aria-label="Previous slide"
         >
           <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -380,7 +394,7 @@ const Home = () => {
         </button>
         <button 
           onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 p-2 rounded-full shadow-md z-10"
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 p-3 rounded-full shadow-md z-10 transition-all duration-300 hover:scale-110"
           aria-label="Next slide"
         >
           <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -389,13 +403,20 @@ const Home = () => {
         </button>
       </section>
 
-      <section id="about" className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
-          {/* Section Header */}
+      {/* About Section with Enhanced Animations */}
+      <section id="about" className="py-20 bg-white relative overflow-hidden">
+        {/* Floating elements */}
+        <div className="absolute -top-20 -right-20 w-64 h-64 opacity-5 animate-float">
+          <svg viewBox="0 0 200 200" className="text-green-800">
+            <path fill="currentColor" d="M100,0 C120,40 160,60 160,100 C160,140 120,160 100,200 C80,160 40,140 40,100 C40,60 80,40 100,0 Z"/>
+          </svg>
+        </div>
+
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">About CReATe Center</h2>
-            <div className="w-20 h-1 bg-green-600 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold text-[#2a5c3e] mb-4 animate-fade-in-up">About CReATe Center</h2>
+            <div className="w-20 h-1.5 bg-gradient-to-r from-green-500 to-green-600 mx-auto mb-6 rounded-full animate-scale-x"></div>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto animate-fade-in-up delay-100">
               Pioneering innovation in resource assessment and agricultural technologies
             </p>
           </div>
@@ -403,12 +424,12 @@ const Home = () => {
           {/* Content Grid */}
           <div className="flex flex-col lg:flex-row gap-12 items-start">
             {/* Left Column - Image */}
-            <div className="lg:w-1/2 order-2 lg:order-1">
-              <div className="relative rounded-xl overflow-hidden shadow-lg">
+            <div className="lg:w-1/2 order-2 lg:order-1 space-y-6">
+              <div className="relative rounded-xl overflow-hidden shadow-lg group animate-fade-in-up delay-200">
                 <img 
                   src="/images/logos/picture5.jpg" 
-                  alt="Research team at CReATe Center, Caraga State University"
-                  className="w-full h-auto object-cover"
+                  alt="Research team at CReATe Center"
+                  className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
                   <p className="text-white text-sm font-medium">
@@ -416,13 +437,12 @@ const Home = () => {
                   </p>
                 </div>
               </div>
-              <br />
               
               {/* Mission & Vision Cards */}
-              <div className="grid md:grid-cols-2 gap-6 mb-10">
-                <div className="bg-green-50 p-6 rounded-xl">
+              <div className="grid md:grid-cols-2 gap-6 animate-fade-in-up delay-300">
+                <div className="bg-green-50 p-6 rounded-xl hover:shadow-md transition-all duration-300 hover:-translate-y-1">
                   <div className="flex items-center mb-4">
-                    <div className="bg-green-100 p-2 rounded-full mr-4">
+                    <div className="bg-green-100 p-2 rounded-full mr-4 group-hover:rotate-12 transition-transform duration-300">
                       <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                       </svg>
@@ -434,9 +454,9 @@ const Home = () => {
                   </p>
                 </div>
 
-                <div className="bg-blue-50 p-6 rounded-xl">
+                <div className="bg-blue-50 p-6 rounded-xl hover:shadow-md transition-all duration-300 hover:-translate-y-1">
                   <div className="flex items-center mb-4">
-                    <div className="bg-blue-100 p-2 rounded-full mr-4">
+                    <div className="bg-blue-100 p-2 rounded-full mr-4 group-hover:-rotate-12 transition-transform duration-300">
                       <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                       </svg>
@@ -451,7 +471,7 @@ const Home = () => {
             </div>
 
             {/* Right Column - Content */}
-            <div className="lg:w-1/2 order-1 lg:order-2">
+            <div className="lg:w-1/2 order-1 lg:order-2 animate-fade-in-up delay-400">
               {/* Center Introduction */}
               <div className="mb-10">
                 <h1 className="text-3xl font-semibold text-gray-800 mb-6">
@@ -468,16 +488,16 @@ const Home = () => {
                   </p>
                   
                   <ul className="list-disc pl-6 space-y-2">
-                    <li>Advanced agricultural and biosystems engineering research</li>
-                    <li>High-performance computing and data analytics</li>
-                    <li>Emerging technology development and implementation</li>
-                    <li>Professional training and extension services</li>
-                    <li>Technology transfer and commercialization</li>
+                    <li className="hover:text-green-700 transition-colors duration-300">Advanced agricultural and biosystems engineering research</li>
+                    <li className="hover:text-green-700 transition-colors duration-300">High-performance computing and data analytics</li>
+                    <li className="hover:text-green-700 transition-colors duration-300">Emerging technology development and implementation</li>
+                    <li className="hover:text-green-700 transition-colors duration-300">Professional training and extension services</li>
+                    <li className="hover:text-green-700 transition-colors duration-300">Technology transfer and commercialization</li>
                   </ul>
                   
-                  <p className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-600 italic">
+                  <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-600 italic transition-all duration-300 hover:shadow-sm">
                     Originally established as the Center for Renewable Energy and Alternative Technology (CREATe), we evolved into our current form following significant capability enhancements through the PhilLiDAR 2 project and in response to the region's rich natural resource endowment.
-                  </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -485,136 +505,196 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Services Section */}
-      <section id="services" className="services-section py-20 bg-gray-50">
-        <div className="section-container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Our Services</h2>
-            <div className="w-20 h-1 bg-green-600 mx-auto mb-6"></div>
+      {/* Services Section with Enhanced Animations */}
+      <section id="services" className="services-section py-20 bg-gray-50 relative overflow-hidden">
+        {/* Floating elements */}
+        <div className="absolute -bottom-20 -left-20 w-64 h-64 opacity-5 animate-float-leaf-reverse">
+          <svg viewBox="0 0 200 200" className="text-green-800">
+            <path fill="currentColor" d="M100,0 C120,40 160,60 160,100 C160,140 120,160 100,200 C80,160 40,140 40,100 C40,60 80,40 100,0 Z"/>
+          </svg>
+        </div>
+
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-[#2a5c3e] mb-4 animate-fade-in-up">Our Services</h2>
+            <div className="w-20 h-1.5 bg-gradient-to-r from-green-500 to-green-600 mx-auto mb-6 rounded-full animate-scale-x"></div>
           </div>
           
           <div className="services-grid grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-            {/* Land and Water Resources Service */}
-            <div className="service-card bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 border-t-4 border-green-500">
-              <div className="icon-container bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
+            {/* Service cards with enhanced animations */}
+            {[
+              {
+                title: "Trainings and Consultancy on Land and Water Resources Engineering and Technology",
+                description: "Consultations, trainings, and referrals on GIS operations for creating, processing, and analyzing agrometeorological, hydrologic, and resource maps including vulnerability and suitability assessments.",
+                icon: "M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3",
+                delay: "delay-200"
+              },
+              {
+                title: "Trainings and Consultancy on Agricultural Bio-Processing",
+                description: "Trainings and consultations on handling, storage, and processing of agricultural materials, including equipment design to reduce postharvest losses and add economic value using advanced analytical tools.",
+                icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z",
+                delay: "delay-300"
+              },
+              {
+                title: "Trainings and Consultancy on Agricultural Machinery & Structures Designs",
+                description: "Our professional Agricultural and Biosystems Engineers provide trainings, consultations, designs, and analyses for agricultural machinery and structures using state-of-the-art facilities.",
+                icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z",
+                delay: "delay-400"
+              },
+              {
+                title: "Trainings and Assessment for Rice Machinery Operations NCII",
+                description: "TESDA-supported trainings and assessments for Rice Machinery Operations National Certificate II, available to students, professionals, and farmers.",
+                icon: "M13 10V3L4 14h7v7l9-11h-7z",
+                delay: "delay-500"
+              }
+            ].map((service, index) => (
+              <div 
+                key={index}
+                className={`service-card bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-2 border-t-4 border-green-500 animate-fade-in-up ${service.delay}`}
+              >
+                <div className="icon-container bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6 mx-auto group-hover:rotate-12 transition-transform duration-300">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d={service.icon}></path>
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4 group-hover:text-green-700 transition-colors duration-300">{service.title}</h3>
+                <p className="text-gray-600 mb-4 group-hover:text-gray-800 transition-colors duration-300">{service.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+     {/* Benefits / Why Choose Us Section with Animations */}
+    <section className="benefits-section py-20 bg-gradient-to-b from-[#f0f7f2] to-[#e0efe5] relative overflow-hidden">
+      {/* Floating leaf decorations */}
+      <div className="absolute top-10 left-10 w-24 h-24 opacity-10 animate-float-leaf">
+        <svg viewBox="0 0 100 100" className="text-green-800">
+          <path fill="currentColor" d="M50,0 C60,20 80,30 80,50 C80,70 60,80 50,100 C40,80 20,70 20,50 C20,30 40,20 50,0 Z"/>
+        </svg>
+      </div>
+      <div className="absolute bottom-20 right-16 w-20 h-20 opacity-10 animate-float-leaf-reverse">
+        <svg viewBox="0 0 100 100" className="text-green-800">
+          <path fill="currentColor" d="M50,0 C60,20 80,30 80,50 C80,70 60,80 50,100 C40,80 20,70 20,50 C20,30 40,20 50,0 Z"/>
+        </svg>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-[#2a5c3e] mb-4 animate-fade-in-up">
+            Why Choose CReATe Center
+          </h2>
+          <div className="w-20 h-1.5 bg-gradient-to-r from-[#6a9f7d] to-[#8bc34a] mx-auto mb-6 rounded-full animate-scale-x"></div>
+          <p className="text-lg text-[#4a6b57] max-w-3xl mx-auto animate-fade-in-up delay-100">
+            Discover the advantages of working with our expert team and cutting-edge facilities
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Benefit 1 - Technology */}
+          <div className="benefit-card bg-white/90 backdrop-blur-sm p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 hover:-translate-y-2 border border-[#e0e8e2] hover:border-[#c1d7c7] relative overflow-hidden group animate-fade-in-up delay-200">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#f1f8f3]/30 to-[#e0efe5]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10">
+              <div className="icon-container bg-[#e8f3eb] w-16 h-16 rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:bg-[#d4e8da] transition-all duration-300 group-hover:rotate-6">
+                <svg className="w-8 h-8 text-[#3a7d54] group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Trainings and Consultancy on Land and Water Resources Engineering and Technology</h3>
-              <p className="text-gray-600 mb-4">
-                Consultations, trainings, and referrals on GIS operations for creating, processing, and analyzing agrometeorological, hydrologic, and resource maps including vulnerability and suitability assessments.
+              <h3 className="text-xl font-semibold text-center text-[#2a5c3e] mb-4 group-hover:text-[#1e3b2a] transition-colors duration-300">Cutting-Edge Technology</h3>
+              <p className="text-[#4a6b57] text-center group-hover:text-[#3a5a47] transition-colors duration-300">
+                Access to state-of-the-art equipment and the latest analytical tools for precise resource assessment and agricultural innovation.
               </p>
             </div>
+          </div>
 
-            {/* Agricultural Bio-Processing Service */}
-            <div className="service-card bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 border-t-4 border-green-500">
-              <div className="icon-container bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+          {/* Benefit 2 - Experts */}
+          <div className="benefit-card bg-white/90 backdrop-blur-sm p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 hover:-translate-y-2 border border-[#e0e8e2] hover:border-[#c1d7c7] relative overflow-hidden group animate-fade-in-up delay-300">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#f1f8f3]/30 to-[#e0efe5]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10">
+              <div className="icon-container bg-[#e8f3eb] w-16 h-16 rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:bg-[#d4e8da] transition-all duration-300 group-hover:-rotate-6">
+                <svg className="w-8 h-8 text-[#3a7d54] group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Trainings and Consultancy on Agricultural Bio-Processing</h3>
-              <p className="text-gray-600 mb-4">
-                Trainings and consultations on handling, storage, and processing of agricultural materials, including equipment design to reduce postharvest losses and add economic value using advanced analytical tools.
+              <h3 className="text-xl font-semibold text-center text-[#2a5c3e] mb-4 group-hover:text-[#1e3b2a] transition-colors duration-300">Expert Guidance</h3>
+              <p className="text-[#4a6b57] text-center group-hover:text-[#3a5a47] transition-colors duration-300">
+                Work with our team of experienced researchers and agricultural engineers who provide practical, science-based solutions.
               </p>
             </div>
+          </div>
 
-            {/* Agricultural Machinery Service */}
-            <div className="service-card bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 border-t-4 border-green-500">
-              <div className="icon-container bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          {/* Benefit 3 - Support */}
+          <div className="benefit-card bg-white/90 backdrop-blur-sm p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 hover:-translate-y-2 border border-[#e0e8e2] hover:border-[#c1d7c7] relative overflow-hidden group animate-fade-in-up delay-400">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#f1f8f3]/30 to-[#e0efe5]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10">
+              <div className="icon-container bg-[#e8f3eb] w-16 h-16 rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:bg-[#d4e8da] transition-all duration-300 group-hover:rotate-3">
+                <svg className="w-8 h-8 text-[#3a7d54] group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Trainings and Consultancy on Agricultural Machinery & Structures Designs</h3>
-              <p className="text-gray-600 mb-4">
-                Our professional Agricultural and Biosystems Engineers provide trainings, consultations, designs, and analyses for agricultural machinery and structures using state-of-the-art facilities.
+              <h3 className="text-xl font-semibold text-center text-[#2a5c3e] mb-4 group-hover:text-[#1e3b2a] transition-colors duration-300">Comprehensive Support</h3>
+              <p className="text-[#4a6b57] text-center group-hover:text-[#3a5a47] transition-colors duration-300">
+                From initial consultation to implementation, we offer end-to-end support for your agricultural and resource management projects.
               </p>
             </div>
+          </div>
 
-            {/* Rice Machinery Operations Service */}
-            <div className="service-card bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 border-t-4 border-green-500">
-              <div className="icon-container bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          {/* Benefit 4 - Results */}
+          <div className="benefit-card bg-white/90 backdrop-blur-sm p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 hover:-translate-y-2 border border-[#e0e8e2] hover:border-[#c1d7c7] relative overflow-hidden group animate-fade-in-up delay-500">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#f1f8f3]/30 to-[#e0efe5]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10">
+              <div className="icon-container bg-[#e8f3eb] w-16 h-16 rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:bg-[#d4e8da] transition-all duration-300 group-hover:-rotate-3">
+                <svg className="w-8 h-8 text-[#3a7d54] group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Trainings and Assessment for Rice Machinery Operations NCII</h3>
-              <p className="text-gray-600 mb-4">
-                TESDA-supported trainings and assessments for Rice Machinery Operations National Certificate II, available to students, professionals, and farmers.
+              <h3 className="text-xl font-semibold text-center text-[#2a5c3e] mb-4 group-hover:text-[#1e3b2a] transition-colors duration-300">Proven Results</h3>
+              <p className="text-[#4a6b57] text-center group-hover:text-[#3a5a47] transition-colors duration-300">
+                Our methods and technologies have been successfully implemented across the region, delivering measurable improvements in productivity.
+              </p>
+            </div>
+          </div>
+
+          {/* Benefit 5 - Security */}
+          <div className="benefit-card bg-white/90 backdrop-blur-sm p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 hover:-translate-y-2 border border-[#e0e8e2] hover:border-[#c1d7c7] relative overflow-hidden group animate-fade-in-up delay-600">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#f1f8f3]/30 to-[#e0efe5]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10">
+              <div className="icon-container bg-[#e8f3eb] w-16 h-16 rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:bg-[#d4e8da] transition-all duration-300 group-hover:rotate-6">
+                <svg className="w-8 h-8 text-[#3a7d54] group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-center text-[#2a5c3e] mb-4 group-hover:text-[#1e3b2a] transition-colors duration-300">Secure Data Handling</h3>
+              <p className="text-[#4a6b57] text-center group-hover:text-[#3a5a47] transition-colors duration-300">
+                We maintain strict confidentiality and data security protocols for all client projects and research data.
+              </p>
+            </div>
+          </div>
+
+          {/* Benefit 6 - Perspective */}
+          <div className="benefit-card bg-white/90 backdrop-blur-sm p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 hover:-translate-y-2 border border-[#e0e8e2] hover:border-[#c1d7c7] relative overflow-hidden group animate-fade-in-up delay-700">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#f1f8f3]/30 to-[#e0efe5]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10">
+              <div className="icon-container bg-[#e8f3eb] w-16 h-16 rounded-xl flex items-center justify-center mb-6 mx-auto group-hover:bg-[#d4e8da] transition-all duration-300 group-hover:-rotate-6">
+                <svg className="w-8 h-8 text-[#3a7d54] group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-center text-[#2a5c3e] mb-4 group-hover:text-[#1e3b2a] transition-colors duration-300">Local & Global Perspective</h3>
+              <p className="text-[#4a6b57] text-center group-hover:text-[#3a5a47] transition-colors duration-300">
+                Combining local agricultural knowledge with international best practices to deliver customized solutions.
               </p>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="testimonials-section py-20 bg-green-600 text-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">What Our Clients Say</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="testimonial-card bg-green-900 bg-opacity-10 p-8 rounded-lg">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-green-500 mr-4 overflow-hidden">
-                  <img src="https://randomuser.me/api/portraits/women/43.jpg" alt="Client" className="w-full h-full object-cover"/>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Sarah Johnson</h4>
-                  <p className="text-green-100 text-sm">ACTIVE PARTNERS</p>
-                </div>
-              </div>
-              <p className="italic">"The career guidance I received was transformative. I now have clarity and confidence in my professional path."</p>
-              <div className="flex mt-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                ))}
-              </div>
-            </div>
-            <div className="testimonial-card  bg-green-900 bg-opacity-10 p-8 rounded-lg">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-green-500 mr-4 overflow-hidden">
-                  <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Client" className="w-full h-full object-cover"/>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Michael Chen</h4>
-                  <p className="text-green-100 text-sm">Family Therapy Client</p>
-                </div>
-              </div>
-              <p className="italic">"Our family communication has improved dramatically thanks to the sessions at Harmony. Highly recommend!"</p>
-              <div className="flex mt-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                ))}
-              </div>
-            </div>
-            <div className="testimonial-card  bg-green-900 bg-opacity-10 p-8 rounded-lg">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-green-500 mr-4 overflow-hidden">
-                  <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Client" className="w-full h-full object-cover"/>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Emily Rodriguez</h4>
-                  <p className="text-green-100 text-sm">Personal Counseling Client</p>
-                </div>
-              </div>
-              <p className="italic">"The compassionate approach of my counselor helped me through a very difficult time. Forever grateful."</p>
-              <div className="flex mt-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      </div>
+    </section>
 
       {/* Contact Section */}
       <section id="contact" className="contact-section py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Contact Us</h2>
+            <h2 className="text-4xl font-bold text-[#2a5c3e] mb-4 animate-fade-in-up">Contact Us</h2>
             <div className="w-20 h-1 bg-green-600 mx-auto mb-6"></div>
             <p className="text-lg text-gray-600">
               Schedule a consultation with our agricultural technology experts
@@ -722,227 +802,230 @@ const Home = () => {
       </section>
 
       {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div 
-            className="absolute inset-0 bg-black bg-opacity-50"
-            onClick={() => {
-              setIsModalOpen(false);
-              setShowCalendarView(false);
-            }}
-          ></div>
-          
-          <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <button
-              onClick={() => {
-                setIsModalOpen(false);
-                setShowCalendarView(false);
-              }}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+{isModalOpen && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    {/* Overlay with green tint instead of black */}
+    <div 
+      className="absolute inset-0 bg-green-900/30 backdrop-blur-sm"
+      onClick={() => {
+        setIsModalOpen(false);
+        setShowCalendarView(false);
+      }}
+    ></div>
+    
+    {/* Modal container */}
+    <div className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-green-100">
+      {/* Close button */}
+      <button
+        onClick={() => {
+          setIsModalOpen(false);
+          setShowCalendarView(false);
+        }}
+        className="absolute top-4 right-4 text-green-600 hover:text-green-800 transition-colors duration-300 p-1 rounded-full hover:bg-green-50"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+
+      <div className="p-8">
+        <h2 className="text-2xl font-bold text-green-800 mb-6">Schedule an Appointment</h2>
+        
+        {isSubmitted ? (
+          <div className="success-message bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg relative mb-6">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
               </svg>
-            </button>
-
-            <div className="p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Schedule an Appointment</h2>
+              <span>Thank you for your message! We'll get back to you within 24 hours.</span>
+            </div>
+          </div>
+        ) : showCalendarView ? (
+          <div className="space-y-6">
+            {/* Calendar View */}
+            <div className="bg-white rounded-lg shadow-sm border border-green-100">
+              <div className="flex items-center justify-between p-4 border-b border-green-100">
+                <button 
+                  onClick={() => navigateMonth('prev')}
+                  className="p-2 rounded-full hover:bg-green-50 text-green-600 hover:text-green-800 transition-colors duration-300"
+                >
+                  &lt;
+                </button>
+                <h3 className="font-semibold text-green-800">
+                  {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                </h3>
+                <button 
+                  onClick={() => navigateMonth('next')}
+                  className="p-2 rounded-full hover:bg-green-50 text-green-600 hover:text-green-800 transition-colors duration-300"
+                >
+                  &gt;
+                </button>
+              </div>
               
-              {isSubmitted ? (
-                <div className="success-message bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6">
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
-                    </svg>
-                    <span>Thank you for your message! We'll get back to you within 24 hours.</span>
+              {/* Weekday Headers */}
+              <div className="grid grid-cols-7 gap-1 p-2 bg-green-50 rounded-t-lg">
+                {['S', 'M', 'T', 'W', 'TH', 'F', 'ST'].map(day => (
+                  <div key={day} className="text-center font-medium text-sm py-1 text-green-700">
+                    {day}
                   </div>
+                ))}
+              </div>
+              
+              {/* Calendar Grid */}
+              <div className="grid grid-cols-7 gap-1 p-2">
+                {renderCalendarDays()}
+              </div>
+            </div>
+
+            {/* Time Slot Selection */}
+            {appointmentDate && (
+              <div className="border-t border-green-100 pt-6">
+                <h3 className="font-semibold mb-4 flex items-center text-green-800">
+                  <ClockIcon className="h-5 w-5 mr-2 text-green-600" />
+                  Available times for {new Date(appointmentDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                </h3>
+
+                <div className="grid grid-cols-3 gap-2">
+                  {timeSlots.map((time) => (
+                    <button
+                      key={time}
+                      onClick={() => handleTimeSlotSelect(time)}
+                      className={`py-2 px-3 rounded-md text-sm border transition-colors duration-300
+                        ${selectedTime === time 
+                          ? 'bg-green-600 text-white border-green-600' 
+                          : 'bg-white text-green-700 border-green-200 hover:bg-green-50'
+                        }
+                      `}
+                    >
+                      {time}
+                    </button>
+                  ))}
                 </div>
-              ) : showCalendarView ? (
-                <div className="space-y-6">
-                  {/* Calendar View */}
-                  <div className="bg-white rounded-lg shadow">
-                    <div className="flex items-center justify-between p-4 border-b">
-                      <button 
-                        onClick={() => navigateMonth('prev')}
-                        className="p-2 rounded-full hover:bg-gray-100"
-                      >
-                        &lt;
-                      </button>
-                      <h3 className="font-semibold">
-                        {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                      </h3>
-                      <button 
-                        onClick={() => navigateMonth('next')}
-                        className="p-2 rounded-full hover:bg-gray-100"
-                      >
-                        &gt;
-                      </button>
-                    </div>
-                    
-                    {/* Weekday Headers */}
-                    <div className="grid grid-cols-7 gap-1 p-2">
-                      {['S', 'M', 'T', 'W', 'TH', 'F', 'ST'].map(day => (
-                        <div key={day} className="text-center font-medium text-sm py-1">
-                          {day}
-                        </div>
-                      ))}
-                    </div>
-                    
-                    {/* Calendar Grid */}
-                    <div className="grid grid-cols-7 gap-1">
-                      {renderCalendarDays()}
-                    </div>
+
+                {selectedTime && (
+                  <div className="mt-6">
+                    <p className="text-sm mb-4 text-green-700">
+                      Selected appointment: {new Date(appointmentDate).toLocaleDateString()} at {selectedTime}
+                    </p>
+                    <button
+                      onClick={() => setShowCalendarView(false)}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md transition-colors duration-300"
+                    >
+                      Continue to Appointment Form
+                    </button>
                   </div>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="form-group">
+              <label htmlFor="appointmentDate" className="block text-sm font-medium text-green-700 mb-1">Appointment Date & Time</label>
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  id="appointmentDate"
+                  value={appointmentDate ? 
+                    `${new Date(appointmentDate).toLocaleDateString()} at ${selectedTime || ''}` : 
+                    'Not selected'}
+                  readOnly
+                  className="w-full px-4 py-3 border border-green-200 rounded-l-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300 bg-green-50 text-green-800"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCalendarView(true)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-r-md transition duration-300 flex items-center justify-center"
+                >
+                  <CalendarIcon className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
 
-                  {/* Time Slot Selection */}
-                  {appointmentDate && (
-                    <div className="border-t pt-6">
-                      <h3 className="font-semibold mb-4 flex items-center">
-                        <ClockIcon className="h-5 w-5 mr-2 text-green-600" />
-                        Available times for {new Date(appointmentDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                      </h3>
+            <div className="form-group">
+              <label className="block text-sm font-medium text-green-700 mb-2">I am a:</label>
+              <div className="flex space-x-4">
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    className="form-radio h-5 w-5 text-green-600 border-green-300 focus:ring-green-500"
+                    name="userType"
+                    value="student"
+                    checked={userType === 'student'}
+                    onChange={() => setUserType('student')}
+                  />
+                  <span className="ml-2 text-green-800">Student</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    className="form-radio h-5 w-5 text-green-600 border-green-300 focus:ring-green-500"
+                    name="userType"
+                    value="outsider"
+                    checked={userType === 'outsider'}
+                    onChange={() => setUserType('outsider')}
+                  />
+                  <span className="ml-2 text-green-800">Outsider</span>
+                </label>
+              </div>
+            </div>
 
-                      <div className="grid grid-cols-3 gap-2">
-                        {timeSlots.map((time) => (
-                          <button
-                            key={time}
-                            onClick={() => handleTimeSlotSelect(time)}
-                            className={`py-2 px-3 rounded-md text-sm border
-                              ${selectedTime === time 
-                                ? 'bg-green-600 text-white border-green-600' 
-                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                              }
-                            `}
-                          >
-                            {time}
-                          </button>
-                        ))}
-                      </div>
+            <div className="form-group">
+              <label htmlFor="name" className="block text-sm font-medium text-green-700 mb-1">Full Name</label>
+              <input
+                type="text"
+                id="name"
+                placeholder='e.g. Sada Haro'
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-3 border border-green-200 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300 bg-white text-green-800"
+                required
+              />
+            </div>
 
-                      {selectedTime && (
-                        <div className="mt-6">
-                          <p className="text-sm mb-4">
-                            Selected appointment: {new Date(appointmentDate).toLocaleDateString()} at {selectedTime}
-                          </p>
-                          <button
-                            onClick={() => setShowCalendarView(false)}
-                            className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md"
-                          >
-                            Continue to Appointment Form
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
+            <div className="form-group">
+              <label htmlFor="email" className="block text-sm font-medium text-green-700 mb-1">Email</label>
+              <input
+                type="email"
+                id="email"
+                placeholder='e.g. sadaharo@example.com'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-green-200 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300 bg-white text-green-800"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="phone" className="block text-sm font-medium text-green-700 mb-1">Phone Number</label>
+              <input
+                type="tel"
+                id="phone"
+                placeholder='e.g. 09123456789'
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full px-4 py-3 border border-green-200 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300 bg-white text-green-800"
+                required
+              />
+            </div>
+
+            {userType === 'student' && (
+              <>
+                <div className="form-group">
+                  <label htmlFor="studentId" className="block text-sm font-medium text-green-700 mb-1">Student ID</label>
+                  <input
+                    type="text"
+                    id="studentId"
+                    placeholder='e.g. 201-00000'
+                    value={studentId}
+                    onChange={(e) => setStudentId(e.target.value)}
+                    className="w-full px-4 py-3 border border-green-200 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300 bg-white text-green-800"
+                    required
+                  />
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="form-group">
-                    <label htmlFor="appointmentDate" className="block text-sm font-medium text-gray-700 mb-1">Appointment Date & Time</label>
-                    <div className="flex items-center">
-                      <input
-                        type="text"
-                        id="appointmentDate"
-                        value={appointmentDate ? 
-                          `${new Date(appointmentDate).toLocaleDateString()} at ${selectedTime || ''}` : 
-                          'Not selected'}
-                        readOnly
-                        className="w-full px-4 py-3 border border-gray-300 rounded-l-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300 bg-gray-50"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowCalendarView(true)}
-                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-r-md transition duration-300 flex items-center justify-center"
-                      >
-                        <CalendarIcon className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">I am a:</label>
-                    <div className="flex space-x-4">
-                      <label className="inline-flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio h-5 w-5 text-green-600"
-                          name="userType"
-                          value="student"
-                          checked={userType === 'student'}
-                          onChange={() => setUserType('student')}
-                        />
-                        <span className="ml-2 text-gray-700">Student</span>
-                      </label>
-                      <label className="inline-flex items-center">
-                        <input
-                          type="radio"
-                          className="form-radio h-5 w-5 text-green-600"
-                          name="userType"
-                          value="outsider"
-                          checked={userType === 'outsider'}
-                          onChange={() => setUserType('outsider')}
-                        />
-                        <span className="ml-2 text-gray-700">Outsider</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <input
-                      type="text"
-                      id="name"
-                      placeholder='e.g. Sada Haro'
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input
-                      type="email"
-                      id="email"
-                      placeholder='e.g. sadaharo@example.com'
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      placeholder='e.g. 09123456789'
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
-                      required
-                    />
-                  </div>
-
-                  {userType === 'student' && (
-                    <>
-                      <div className="form-group">
-                        <label htmlFor="studentId" className="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
-                        <input
-                          type="text"
-                          id="studentId"
-                          placeholder='e.g. 201-00000'
-                          value={studentId}
-                          onChange={(e) => setStudentId(e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition duration-300"
-                          required
-                        />
-                      </div>
 
                       <div className="form-group">
-                        <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                        <label htmlFor="department" className="block text-sm font-medium text-green-700 mb-1">Department</label>
                         <input
                           type="text"
                           id="department"
@@ -955,7 +1038,7 @@ const Home = () => {
                       </div>
 
                       <div className="form-group">
-                        <label htmlFor="course" className="block text-sm font-medium text-gray-700 mb-1">Course</label>
+                        <label htmlFor="course" className="block text-sm font-medium text-green-700 mb-1">Course</label>
                         <input
                           type="text"
                           id="course"
@@ -968,7 +1051,7 @@ const Home = () => {
                       </div>
 
                       <div className="form-group">
-                        <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">Year Level</label>
+                        <label htmlFor="year" className="block text-sm font-medium text-green-700 mb-1">Year Level</label>
                         <input
                           type="text"
                           id="year"
@@ -985,7 +1068,7 @@ const Home = () => {
                   {userType === 'outsider' && (
                     <>
                       <div className="form-group">
-                        <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                        <label htmlFor="address" className="block text-sm font-medium text-green-700 mb-1">Address</label>
                         <input
                           type="text"
                           id="address"
@@ -998,7 +1081,7 @@ const Home = () => {
                       </div>
 
                       <div className="form-group">
-                        <label htmlFor="office" className="block text-sm font-medium text-gray-700 mb-1">Office/Organization</label>
+                        <label htmlFor="office" className="block text-sm font-medium text-green-700 mb-1">Office/Organization</label>
                         <input
                           type="text"
                           id="affiliation_or_office"
@@ -1013,7 +1096,7 @@ const Home = () => {
                   )}
 
                   <div className="form-group">
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Purpose of Consultation</label>
+                    <label htmlFor="message" className="block text-sm font-medium text-green-700 mb-1">Purpose of Consultation</label>
                     <textarea
                       id="message"
                       value={message}
@@ -1025,18 +1108,26 @@ const Home = () => {
                   </div>
 
                   <button 
-                    type="submit" 
-                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-md transition duration-300 shadow-md"
-                    disabled={isLoading || !appointmentDate}
-                  >
-                    {isLoading ? 'Sending...' : 'Send Message'}
-                  </button>
-                </form>
-              )}
-            </div>
+                  type="submit" 
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-md transition duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+                  disabled={isLoading || !appointmentDate}
+                >
+                  {isLoading ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Sending...
+                    </span>
+                  ) : 'Send Message'}
+                </button>
+              </form>
+            )}
           </div>
         </div>
-      )}
+      </div>
+    )}
 
       {/* Footer */}
       <footer className="footer bg-gray-800 text-white py-12">
@@ -1066,7 +1157,6 @@ const Home = () => {
             </div>
           </div>
         </div>
-        nigger
       </footer>
     </div>
   );
