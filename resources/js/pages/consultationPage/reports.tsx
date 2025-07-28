@@ -261,7 +261,7 @@ export default function ConsultationPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
                 <div className="relative rounded-md shadow-sm">
@@ -278,7 +278,7 @@ export default function ConsultationPage() {
                 </div>
               </div>
               
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
                 <select
                   className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border"
@@ -289,7 +289,7 @@ export default function ConsultationPage() {
                     <option key={dept} value={dept}>{dept}</option>
                   ))}
                 </select>
-              </div>
+              </div> */}
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">From Date</label>
